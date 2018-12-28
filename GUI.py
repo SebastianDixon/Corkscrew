@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import time
 
-#First Window
+# First Window
 
 class Window(QWidget and QMainWindow):
 
@@ -32,28 +32,38 @@ class Window(QWidget and QMainWindow):
         runbtn.move(350, 400)
         runbtn.clicked.connect(self.util_timer)
 
-        RANDOM = QPushButton('Graphs', self)
-        RANDOM.resize(RANDOM.sizeHint())
-        RANDOM.move(200, 200)
-        RANDOM.clicked.connect(self.outpututilgraphs())
+        random = QPushButton('Graphs', self)
+        random.resize(random.sizeHint())
+        random.move(200, 200)
+        random.clicked.connect(self.outpututilgraphs())
 
-#PC Buttons
+        random2 = QPushButton('CPU utilisation Mean', self)
+        random2.resize(random2.sizeHint())
+        random2.move(200, 250)
+        random2.clicked.connect(self.cpu_util_mean)
 
-        PCbtn = QPushButton('My PC', self)
-        PCbtn.resize(PCbtn.sizeHint())
-        PCbtn.move(40, 25)
-        PCbtn.clicked.connect(self.show_PcWindow)
+        random3 = QPushButton('GPU utilisation Mean', self)
+        random3.resize(random3.sizeHint())
+        random3.move(200, 300)
+        random3.clicked.connect(self.gpu_util_mean)
 
-#Leaderboard Buttons
+# PC Buttons
 
-        Leadbtn = QPushButton('Leaderboard', self)
-        Leadbtn.resize(Leadbtn.sizeHint())
-        Leadbtn.move(200, 25)
+        pcbtn = QPushButton('My PC', self)
+        pcbtn.resize(pcbtn.sizeHint())
+        pcbtn.move(40, 25)
+        pcbtn.clicked.connect(self.create_window)
+
+# Leaderboard Buttons
+
+        leadBtn = QPushButton('Leaderboard', self)
+        leadBtn.resize(leadBtn.sizeHint())
+        leadBtn.move(200, 25)
         # here goes a function which opens a new window with leaderboard info from the database
 
         self.show()
 
-#FUNCTIONS
+# functions
 
     def exit_app(self):
         answer = QMessageBox.question(self, 'Exit', 'Are you sure?', QMessageBox.Yes | QMessageBox.No)
@@ -63,6 +73,21 @@ class Window(QWidget and QMainWindow):
         else:
             print('Application Not Quit')
 
+    def cpu_util_mean(self):
+        length = len(Graph_Util.cpu_y)
+        product = 0
+        for x in range(length):
+            product = product + Graph_Util.cpu_y[x]
+        mean = product / length
+        print('Average CPU utilisation =', mean)
+
+    def gpu_util_mean(self):
+        length = len(Graph_Util.gpu_y)
+        product = 0
+        for x in range(0, length):
+            product = product + Graph_Util.gpu_y[x]
+        mean = product / length
+        print('Average GPU utilisation =', mean)
 
     def util_timer(self):
         for n in range(10):
@@ -74,7 +99,6 @@ class Window(QWidget and QMainWindow):
     def outpututilgraphs(self):
         return Graph_Util.util_graphs
 
-
     def buttonClicked(self):
         sender = self.sender()
         self.statusBar().showMessage(sender.text() + ' was pressed')
@@ -85,48 +109,40 @@ class Window(QWidget and QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    def create_window(self):
+        self.show(PcWindow)
 
-    def show_PcWindow(self):
-        PcWindow()
-
-
-
+# Second Window
 
 
-#Second Window
-
-class PcWindow(QWidget and QMainWindow):
+class PcWindow(QWidget and QWindow):
 
     def __init__(self):
         super().__init__()
         self.Secondwindow()
 
     def Secondwindow(self):
-        self.resize(240, 240)
+        self.resize(120, 240)
         self.center()
         self.setWindowTitle('My PC')
-        self.statusBar()
 
         cpu1btn = QPushButton('CPU Type', self)
         cpu1btn.clicked.connect(self.cpu_type)
         cpu1btn.resize(cpu1btn.sizeHint())
         cpu1btn.move(40, 150)
 
-        self.show()
 
-#FUNCTIONS
+# functions
 
     def cpu_type(self):
         self.statusBar().showMessage(cpuinfo.get_cpu_info()['brand'])
-
-    def show_wind(self):
-        self.show(PcWindow)
 
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
