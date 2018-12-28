@@ -33,10 +33,15 @@ class Window(QWidget and QMainWindow):
         runbtn.move(350, 400)
         runbtn.clicked.connect(self.util_timer)
 
-        random = QPushButton('Graphs', self)
-        random.resize(random.sizeHint())
-        random.move(200, 200)
-        random.clicked.connect(self.outpututilgraphs())
+        graph = QPushButton('Graphs', self)
+        graph.resize(graph.sizeHint())
+        graph.move(200, 200)
+        graph.clicked.connect(self.output_util_graphs())
+
+        graph2 = QPushButton('RAM Graphs', self)
+        graph2.resize(graph2.sizeHint())
+        graph2.move(300, 200)
+        graph2.clicked.connect(self.output_ram_util_graphs())
 
         random2 = QPushButton('CPU utilisation Mean', self)
         random2.resize(random2.sizeHint())
@@ -59,6 +64,11 @@ class Window(QWidget and QMainWindow):
         ramBtn.resize(ramBtn.sizeHint())
         ramBtn.move(40, 75)
         ramBtn.clicked.connect(self.ram_quantity)
+
+        ram_util_Btn = QPushButton('RAM utilisation', self)
+        ram_util_Btn.resize(ram_util_Btn.sizeHint())
+        ram_util_Btn.move(40, 125)
+        ram_util_Btn.clicked.connect(self.ram_util_timer)
 
 # Leaderboard Buttons
 
@@ -109,8 +119,19 @@ class Window(QWidget and QMainWindow):
         ramQuantity = gigByte - remainder
         print('RAM Quantity =', ramQuantity, 'GB')
 
-    def outpututilgraphs(self):
+    def ram_util_timer(self):
+        mem = virtual_memory()
+        for z in range(10):
+            Graph_Util.ram_y.append(mem.percent)
+            Graph_Util.ram_time_x.append(z)
+            time.sleep(1)
+        print(Graph_Util.ram_y, Graph_Util.ram_time_x)
+
+    def output_util_graphs(self):
         return Graph_Util.util_graphs
+
+    def output_ram_util_graphs(self):
+        return Graph_Util.ram_util_graph
 
     def buttonClicked(self):
         sender = self.sender()
