@@ -3,6 +3,7 @@ import Graph_Util
 import cpuinfo
 import os
 import psutil
+from psutil import virtual_memory
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -54,6 +55,11 @@ class Window(QWidget and QMainWindow):
         pcbtn.move(40, 25)
         pcbtn.clicked.connect(self.create_window)
 
+        ramBtn = QPushButton('RAM quantity', self)
+        ramBtn.resize(ramBtn.sizeHint())
+        ramBtn.move(40, 75)
+        ramBtn.clicked.connect(self.ram_quantity)
+
 # Leaderboard Buttons
 
         leadBtn = QPushButton('Leaderboard', self)
@@ -95,6 +101,13 @@ class Window(QWidget and QMainWindow):
             Graph_Util.time_x.append(n)
             time.sleep(1)
         print(Graph_Util.cpu_y, Graph_Util.gpu_y, Graph_Util.time_x)
+
+    def ram_quantity(self):
+        mem = virtual_memory()
+        gigByte = mem.total / 1000000000
+        remainder = gigByte % 1
+        ramQuantity = gigByte - remainder
+        print('RAM Quantity =', ramQuantity, 'GB')
 
     def outpututilgraphs(self):
         return Graph_Util.util_graphs
