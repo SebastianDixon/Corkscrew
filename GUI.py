@@ -32,6 +32,11 @@ class Window(QWidget and QMainWindow):
         runbtn.resize(runbtn.sizeHint())
         runbtn.move(350, 400)
         runbtn.clicked.connect(self.util_timer)
+        runbtn.clicked.connect(self.ram_util_timer)
+
+        runbtn.clicked.connect(self.cpu_util_mean)
+        runbtn.clicked.connect(self.gpu_util_mean)
+        runbtn.clicked.connect(self.ram_util_mean)
 
         graph = QPushButton('Graphs', self)
         graph.resize(graph.sizeHint())
@@ -40,18 +45,8 @@ class Window(QWidget and QMainWindow):
 
         graph2 = QPushButton('RAM Graphs', self)
         graph2.resize(graph2.sizeHint())
-        graph2.move(300, 200)
+        graph2.move(200, 250)
         graph2.clicked.connect(self.output_ram_util_graphs())
-
-        random2 = QPushButton('CPU utilisation Mean', self)
-        random2.resize(random2.sizeHint())
-        random2.move(200, 250)
-        random2.clicked.connect(self.cpu_util_mean)
-
-        random3 = QPushButton('GPU utilisation Mean', self)
-        random3.resize(random3.sizeHint())
-        random3.move(200, 300)
-        random3.clicked.connect(self.gpu_util_mean)
 
 # PC Buttons
 
@@ -64,11 +59,6 @@ class Window(QWidget and QMainWindow):
         ramBtn.resize(ramBtn.sizeHint())
         ramBtn.move(40, 75)
         ramBtn.clicked.connect(self.ram_quantity)
-
-        ram_util_Btn = QPushButton('RAM utilisation', self)
-        ram_util_Btn.resize(ram_util_Btn.sizeHint())
-        ram_util_Btn.move(40, 125)
-        ram_util_Btn.clicked.connect(self.ram_util_timer)
 
 # Leaderboard Buttons
 
@@ -95,7 +85,8 @@ class Window(QWidget and QMainWindow):
         for x in range(length):
             product = product + Graph_Util.cpu_y[x]
         mean = product / length
-        print('Average CPU utilisation =', mean)
+        rounded_mean = round(mean, 3)
+        print('Average CPU utilisation =', rounded_mean,'%')
 
     def gpu_util_mean(self):
         length = len(Graph_Util.gpu_y)
@@ -103,14 +94,24 @@ class Window(QWidget and QMainWindow):
         for x in range(0, length):
             product = product + Graph_Util.gpu_y[x]
         mean = product / length
-        print('Average GPU utilisation =', mean)
+        rounded_mean = round(mean, 3)
+        print('Average GPU utilisation =', rounded_mean,'%')
 
     def util_timer(self):
         for n in range(10):
             Graph_Util.cpu_y.append(psutil.cpu_percent())
             Graph_Util.time_x.append(n)
             time.sleep(1)
-        print(Graph_Util.cpu_y, Graph_Util.gpu_y, Graph_Util.time_x)
+        print(Graph_Util.time_x[-1] +1, 'seconds')
+
+    def ram_util_mean(self):
+        length = len(Graph_Util.ram_y)
+        product = 0
+        for x in range(0, length):
+            product = product + Graph_Util.ram_y[x]
+        mean = product / length
+        rounded_mean = round(mean, 3)
+        print('Average RAM utilisation =', rounded_mean,'%')
 
     def ram_quantity(self):
         mem = virtual_memory()
@@ -125,7 +126,7 @@ class Window(QWidget and QMainWindow):
             Graph_Util.ram_y.append(mem.percent)
             Graph_Util.ram_time_x.append(z)
             time.sleep(1)
-        print(Graph_Util.ram_y, Graph_Util.ram_time_x)
+        print(Graph_Util.ram_time_x[-1] +1, 'seconds')
 
     def output_util_graphs(self):
         return Graph_Util.util_graphs
@@ -148,7 +149,6 @@ class Window(QWidget and QMainWindow):
 
 # Second Window
 
-
 class PcWindow(QWidget and QWindow):
 
     def __init__(self):
@@ -164,7 +164,6 @@ class PcWindow(QWidget and QWindow):
         cpu1btn.clicked.connect(self.cpu_type)
         cpu1btn.resize(cpu1btn.sizeHint())
         cpu1btn.move(40, 150)
-
 
 # functions
 
