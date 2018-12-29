@@ -23,6 +23,7 @@ class Window(QWidget and QMainWindow):
         self.setWindowTitle('Corkscrew')
         self.statusBar()
 
+
         qbtn = QPushButton('Quit', self)
         qbtn.resize(qbtn.sizeHint())
         qbtn.move(350, 25)
@@ -55,17 +56,13 @@ class Window(QWidget and QMainWindow):
         pcbtn.move(40, 25)
         pcbtn.clicked.connect(self.create_window)
 
-        ramBtn = QPushButton('RAM quantity', self)
-        ramBtn.resize(ramBtn.sizeHint())
-        ramBtn.move(40, 75)
-        ramBtn.clicked.connect(self.ram_quantity)
-
 # Leaderboard Buttons
 
         leadBtn = QPushButton('Leaderboard', self)
         leadBtn.resize(leadBtn.sizeHint())
         leadBtn.move(200, 25)
-        # here goes a function which opens a new window with leaderboard info from the database
+        leadBtn.clicked.connect(self.create_leader_window)
+
 
         self.show()
 
@@ -113,13 +110,6 @@ class Window(QWidget and QMainWindow):
         rounded_mean = round(mean, 3)
         print('Average RAM utilisation =', rounded_mean,'%')
 
-    def ram_quantity(self):
-        mem = virtual_memory()
-        gigByte = mem.total / 1000000000
-        remainder = gigByte % 1
-        ramQuantity = gigByte - remainder
-        print('RAM Quantity =', ramQuantity, 'GB')
-
     def ram_util_timer(self):
         mem = virtual_memory()
         for z in range(10):
@@ -145,36 +135,82 @@ class Window(QWidget and QMainWindow):
         self.move(qr.topLeft())
 
     def create_window(self):
-        self.show(PcWindow)
+        self.next = PcWindow()
+
+    def create_leader_window(self):
+        self.next = LeadWindow()
 
 # Second Window
 
-class PcWindow(QWidget and QWindow):
+class PcWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
         self.Secondwindow()
 
     def Secondwindow(self):
-        self.resize(120, 240)
+        self.resize(350, 480)
         self.center()
         self.setWindowTitle('My PC')
+
 
         cpu1btn = QPushButton('CPU Type', self)
         cpu1btn.clicked.connect(self.cpu_type)
         cpu1btn.resize(cpu1btn.sizeHint())
-        cpu1btn.move(40, 150)
+        cpu1btn.move(40, 25)
+
+        ramBtn = QPushButton('RAM quantity', self)
+        ramBtn.resize(ramBtn.sizeHint())
+        ramBtn.move(40, 75)
+        ramBtn.clicked.connect(self.ram_find)
+
+
+        self.show()
 
 # functions
 
     def cpu_type(self):
         self.statusBar().showMessage(cpuinfo.get_cpu_info()['brand'])
+        print(cpuinfo.get_cpu_info()['brand'])
 
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    def ram_find(self):
+        mem = virtual_memory()
+        lower = mem.total / 1000000000
+        gigByte = round(lower, 1)
+        print('RAM size = ', gigByte, 'GB')
+
+
+
+# Third Window
+
+class LeadWindow(QMainWindow):
+
+    def __init__(self):
+        super().__init__()
+        self.Thirdwindow()
+
+    def Thirdwindow(self):
+        self.resize(350, 480)
+        self.center()
+        self.setWindowTitle('Leaderboard')
+
+
+        self.show()
+
+# functions
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
 
 
 if __name__ == '__main__':
