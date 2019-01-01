@@ -3,6 +3,7 @@ import Graph_Util
 import cpuinfo
 import os
 import psutil
+import GPUtil
 from psutil import virtual_memory
 import sys
 from PyQt5.QtWidgets import *
@@ -32,8 +33,9 @@ class Window(QWidget and QMainWindow):
         runbtn = QPushButton('Run', self)
         runbtn.resize(runbtn.sizeHint())
         runbtn.move(350, 400)
-        runbtn.clicked.connect(self.util_timer)
+        runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
+        runbtn.clicked.connect(self.gpu_util_timer)
 
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.gpu_util_mean)
@@ -76,6 +78,15 @@ class Window(QWidget and QMainWindow):
         else:
             print('Application Not Quit')
 
+# cpu
+
+    def cpu_util_timer(self):
+        for n in range(10):
+            Graph_Util.cpu_y.append(psutil.cpu_percent())
+            Graph_Util.time_x.append(n)
+            time.sleep(1)
+        print('cpu done')
+
     def cpu_util_mean(self):
         length = len(Graph_Util.cpu_y)
         product = 0
@@ -84,6 +95,8 @@ class Window(QWidget and QMainWindow):
         mean = product / length
         rounded_mean = round(mean, 3)
         print('Average CPU utilisation =', rounded_mean,'%')
+
+# gpu
 
     def gpu_util_mean(self):
         length = len(Graph_Util.gpu_y)
@@ -94,12 +107,14 @@ class Window(QWidget and QMainWindow):
         rounded_mean = round(mean, 3)
         print('Average GPU utilisation =', rounded_mean,'%')
 
-    def util_timer(self):
+    def gpu_util_timer(self):
         for n in range(10):
-            Graph_Util.cpu_y.append(psutil.cpu_percent())
+            Graph_Util.gpu_y.append(GPUtil.getAvailable(maxLoad= 90))
             Graph_Util.time_x.append(n)
             time.sleep(1)
-        print(Graph_Util.time_x[-1] +1, 'seconds')
+        print('gpu done')
+
+# ram
 
     def ram_util_mean(self):
         length = len(Graph_Util.ram_y)
@@ -116,7 +131,9 @@ class Window(QWidget and QMainWindow):
             Graph_Util.ram_y.append(mem.percent)
             Graph_Util.ram_time_x.append(z)
             time.sleep(1)
-        print(Graph_Util.ram_time_x[-1] +1, 'seconds')
+        print('ram done')
+
+#random
 
     def output_util_graphs(self):
         return Graph_Util.util_graphs
@@ -159,9 +176,14 @@ class PcWindow(QMainWindow):
         cpu1btn.resize(cpu1btn.sizeHint())
         cpu1btn.move(40, 25)
 
+        gpu1btn = QPushButton('GPU Type', self)
+        gpu1btn.clicked.connect(self.gpu_type)
+        gpu1btn.resize(gpu1btn.sizeHint())
+        gpu1btn.move(40, 75)
+
         ramBtn = QPushButton('RAM quantity', self)
         ramBtn.resize(ramBtn.sizeHint())
-        ramBtn.move(40, 75)
+        ramBtn.move(40, 125)
         ramBtn.clicked.connect(self.ram_find)
 
 
@@ -171,7 +193,9 @@ class PcWindow(QMainWindow):
 
     def cpu_type(self):
         self.statusBar().showMessage(cpuinfo.get_cpu_info()['brand'])
-        print(cpuinfo.get_cpu_info()['brand'])
+
+    def gpu_type(self):
+        self.statusBar().showmessage(GPUtil.showUtilization())
 
     def center(self):
         qr = self.frameGeometry()
@@ -184,8 +208,6 @@ class PcWindow(QMainWindow):
         lower = mem.total / 1000000000
         gigByte = round(lower, 1)
         print('RAM size = ', gigByte, 'GB')
-
-
 
 # Third Window
 
@@ -215,6 +237,7 @@ class LeadWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setStyle('Fusion')
     execute = Window()
     sys.exit(app.exec_())
 
