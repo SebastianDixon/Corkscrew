@@ -6,10 +6,11 @@ import psutil
 import GPUtil
 from psutil import virtual_memory
 import sys
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 import time
-
 
 # First Window
 
@@ -20,54 +21,69 @@ class Window(QWidget and QMainWindow):
         self.window()
 
     def window(self):
-        self.resize(480, 480)
+        self.resize(460, 450)
         self.center()
         self.setWindowTitle('Corkscrew')
         self.statusBar()
 
-
         qbtn = QPushButton('Quit', self)
         qbtn.resize(qbtn.sizeHint())
-        qbtn.move(350, 25)
+        qbtn.move(350, 50)
         qbtn.clicked.connect(self.exit_app)
 
-        runbtn = QPushButton('Run', self)
+        runbtn = QPushButton('Utilisation', self)
         runbtn.resize(runbtn.sizeHint())
         runbtn.move(350, 400)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
-        runbtn.clicked.connect(self.N_gpu_util_timer)
 
         runbtn.clicked.connect(self.cpu_util_mean)
-        runbtn.clicked.connect(self.gpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
 
-        graph = QPushButton('Graphs', self)
+        heaven = QPushButton('Benchmark', self)
+        heaven.resize(heaven.sizeHint())
+        heaven.move(350, 350)
+        heaven.clicked.connect(self.open_heaven)
+
+# analysis button
+
+#        centralWidget = QWidget(self)
+#        self.setCentralWidget(centralWidget)
+#        self.comboBox = QComboBox(centralWidget)
+#        self.comboBox.setGeometry(250, 350, 90, 25)
+#        self.comboBox.setObjectName(("GPU brand"))
+#        self.comboBox.addItem("Nvidia")
+#        self.comboBox.addItem("AMD")
+
+        graph = QPushButton('CPU/GPU Graph', self)
         graph.resize(graph.sizeHint())
         graph.move(200, 200)
         graph.clicked.connect(self.output_util_graphs())
 
-        graph2 = QPushButton('RAM Graphs', self)
+        graph2 = QPushButton('RAM Graph', self)
         graph2.resize(graph2.sizeHint())
         graph2.move(200, 250)
         graph2.clicked.connect(self.output_ram_util_graphs())
 
-        heaven = QPushButton('heaven', self)
-        heaven.resize(heaven.sizeHint())
-        heaven.move(350, 350)
-        heaven.clicked.connect(self.open_heaven)
+
 # PC Buttons
 
-        pcbtn = QPushButton('My PC', self)
+        Pc_Title = QLabel("PC", self)
+        Pc_Title.move(75, 20)
+
+        pcbtn = QPushButton('Pc Summary', self)
         pcbtn.resize(pcbtn.sizeHint())
-        pcbtn.move(40, 25)
+        pcbtn.move(40, 50)
         pcbtn.clicked.connect(self.create_window)
 
 # Leaderboard Buttons
 
-        leadBtn = QPushButton('Leaderboard', self)
+        Lead_Title = QLabel("Leaderboard", self)
+        Lead_Title.move(210, 20)
+
+        leadBtn = QPushButton('Ranking', self)
         leadBtn.resize(leadBtn.sizeHint())
-        leadBtn.move(200, 25)
+        leadBtn.move(200, 50)
         leadBtn.clicked.connect(self.create_leader_window)
 
 
@@ -78,7 +94,6 @@ class Window(QWidget and QMainWindow):
     def exit_app(self):
         answer = QMessageBox.question(self, 'Exit', 'Are you sure?', QMessageBox.Yes | QMessageBox.No)
         if answer == QMessageBox.Yes:
-            print('Application Quit')
             sys.exit()
         else:
             print('Application Not Quit')
@@ -102,6 +117,9 @@ class Window(QWidget and QMainWindow):
         print('Average CPU utilisation =', rounded_mean,'%')
 
 # gpu
+
+#    def gpu_choose(self):
+
 
     def N_gpu_util_timer(self):
         for n in range(10):
@@ -170,7 +188,9 @@ class Window(QWidget and QMainWindow):
     def create_leader_window(self):
         self.next = LeadWindow()
 
+
 # Second Window
+
 
 class PcWindow(QMainWindow):
 
@@ -190,7 +210,6 @@ class PcWindow(QMainWindow):
         cpu1btn.move(40, 25)
 
         gpu1btn = QPushButton('GPU Type', self)
-        gpu1btn.clicked.connect(self.gpu_type)
         gpu1btn.resize(gpu1btn.sizeHint())
         gpu1btn.move(40, 75)
 
@@ -207,9 +226,6 @@ class PcWindow(QMainWindow):
     def cpu_type(self):
         self.statusBar().showMessage(cpuinfo.get_cpu_info()['brand'])
 
-#    def gpu_type(self):
- #       self.statusBar().showmessage(GPUtil.showUtilization())
-
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
@@ -222,7 +238,9 @@ class PcWindow(QMainWindow):
         gigByte = round(lower, 1)
         print('RAM size = ', gigByte, 'GB')
 
+
 # Third Window
+
 
 class LeadWindow(QMainWindow):
 
@@ -235,7 +253,6 @@ class LeadWindow(QMainWindow):
         self.center()
         self.setWindowTitle('Leaderboard')
 
-
         self.show()
 
 # functions
@@ -245,7 +262,6 @@ class LeadWindow(QMainWindow):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-
 
 
 if __name__ == '__main__':
