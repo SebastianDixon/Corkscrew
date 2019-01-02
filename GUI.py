@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import time
 
+
 # First Window
 
 class Window(QWidget and QMainWindow):
@@ -35,7 +36,7 @@ class Window(QWidget and QMainWindow):
         runbtn.move(350, 400)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
-        runbtn.clicked.connect(self.gpu_util_timer)
+        runbtn.clicked.connect(self.N_gpu_util_timer)
 
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.gpu_util_mean)
@@ -51,6 +52,10 @@ class Window(QWidget and QMainWindow):
         graph2.move(200, 250)
         graph2.clicked.connect(self.output_ram_util_graphs())
 
+        heaven = QPushButton('heaven', self)
+        heaven.resize(heaven.sizeHint())
+        heaven.move(350, 350)
+        heaven.clicked.connect(self.open_heaven)
 # PC Buttons
 
         pcbtn = QPushButton('My PC', self)
@@ -98,6 +103,16 @@ class Window(QWidget and QMainWindow):
 
 # gpu
 
+    def N_gpu_util_timer(self):
+        for n in range(10):
+            GPUs = GPUtil.getGPUs()
+            gpu_load = GPUs[0].load
+            Graph_Util.gpu_y.append(gpu_load)
+            Graph_Util.time_x.append(n)
+            time.sleep(1)
+        print(Graph_Util.gpu_y)
+        print('gpu done')
+
     def gpu_util_mean(self):
         length = len(Graph_Util.gpu_y)
         product = 0
@@ -106,13 +121,6 @@ class Window(QWidget and QMainWindow):
         mean = product / length
         rounded_mean = round(mean, 3)
         print('Average GPU utilisation =', rounded_mean,'%')
-
-    def gpu_util_timer(self):
-        for n in range(10):
-            Graph_Util.gpu_y.append(GPUtil.getAvailable(maxLoad= 90))
-            Graph_Util.time_x.append(n)
-            time.sleep(1)
-        print('gpu done')
 
 # ram
 
@@ -133,7 +141,12 @@ class Window(QWidget and QMainWindow):
             time.sleep(1)
         print('ram done')
 
-#random
+# benchmark
+
+    def open_heaven(self):
+        os.startfile('C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Unigine/Heaven Benchmark 4.0/Heaven Benchmark 4.0.lnk')
+
+# random
 
     def output_util_graphs(self):
         return Graph_Util.util_graphs
@@ -194,8 +207,8 @@ class PcWindow(QMainWindow):
     def cpu_type(self):
         self.statusBar().showMessage(cpuinfo.get_cpu_info()['brand'])
 
-    def gpu_type(self):
-        self.statusBar().showmessage(GPUtil.showUtilization())
+#    def gpu_type(self):
+ #       self.statusBar().showmessage(GPUtil.showUtilization())
 
     def center(self):
         qr = self.frameGeometry()
