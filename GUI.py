@@ -4,6 +4,7 @@ import cpuinfo
 import os
 import psutil
 import GPUtil
+from pyadl import *
 from psutil import virtual_memory
 import sys
 from PyQt5 import QtCore, QtWidgets
@@ -36,9 +37,11 @@ class Window(QWidget and QMainWindow):
         runbtn.move(350, 400)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
+        runbtn.clicked.connect(self.A_gpu_util_timer)
 
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
+        runbtn.clicked.connect(self.gpu_util_mean)
 
         heaven = QPushButton('Benchmark', self)
         heaven.resize(heaven.sizeHint())
@@ -47,13 +50,11 @@ class Window(QWidget and QMainWindow):
 
 # analysis button
 
-#        centralWidget = QWidget(self)
-#        self.setCentralWidget(centralWidget)
-#        self.comboBox = QComboBox(centralWidget)
-#        self.comboBox.setGeometry(250, 350, 90, 25)
-#        self.comboBox.setObjectName(("GPU brand"))
-#        self.comboBox.addItem("Nvidia")
-#        self.comboBox.addItem("AMD")
+        dropDown = QComboBox(self)
+        dropDown.addItem('Nvidia')
+        dropDown.addItem('AMD')
+        dropDown.setObjectName('GPU brand')
+        dropDown.setGeometry(250, 350, 90, 25)
 
         graph = QPushButton('CPU/GPU Graph', self)
         graph.resize(graph.sizeHint())
@@ -64,7 +65,6 @@ class Window(QWidget and QMainWindow):
         graph2.resize(graph2.sizeHint())
         graph2.move(200, 250)
         graph2.clicked.connect(self.output_ram_util_graphs())
-
 
 # PC Buttons
 
@@ -118,9 +118,6 @@ class Window(QWidget and QMainWindow):
 
 # gpu
 
-#    def gpu_choose(self):
-
-
     def N_gpu_util_timer(self):
         for n in range(10):
             GPUs = GPUtil.getGPUs()
@@ -130,6 +127,20 @@ class Window(QWidget and QMainWindow):
             time.sleep(1)
         print(Graph_Util.gpu_y)
         print('gpu done')
+
+    def A_gpu_util_timer(self):
+        for n in range(10):
+            Graph_Util.gpu_y.append(ADLDevice.getCurrentUsage)
+            Graph_Util.time_x.append(n)
+            time.sleep(1)
+        print(Graph_Util.gpu_y)
+        print('gpu done')
+
+#    def gpu_choice(self):
+#        if choice == ('Nvidia'):
+#            self.N_gpu_util_timer()
+#        else:
+#            self.A_gpu_util_timer()
 
     def gpu_util_mean(self):
         length = len(Graph_Util.gpu_y)
@@ -188,7 +199,6 @@ class Window(QWidget and QMainWindow):
     def create_leader_window(self):
         self.next = LeadWindow()
 
-
 # Second Window
 
 
@@ -205,11 +215,12 @@ class PcWindow(QMainWindow):
 
 
         cpu1btn = QPushButton('CPU Type', self)
-        cpu1btn.clicked.connect(self.cpu_type)
+        cpu1btn.clicked.connect(self.cpu_name)
         cpu1btn.resize(cpu1btn.sizeHint())
         cpu1btn.move(40, 25)
 
-        gpu1btn = QPushButton('GPU Type', self)
+        gpu1btn = QPushButton('AMD GPU Type', self)
+        gpu1btn.clicked.connect(self.A_gpu_name)
         gpu1btn.resize(gpu1btn.sizeHint())
         gpu1btn.move(40, 75)
 
@@ -223,21 +234,23 @@ class PcWindow(QMainWindow):
 
 # functions
 
-    def cpu_type(self):
-        self.statusBar().showMessage(cpuinfo.get_cpu_info()['brand'])
+    def cpu_name(self):
+        print('CPU = ',cpuinfo.get_cpu_info()['brand'])
+
+    def A_gpu_name(self):
+        print('GPU = ', ADLManager.getInstance().getDevices()[0].adapterName)
+
+    def ram_find(self):
+        mem = virtual_memory()
+        lower = mem.total / 1000000000
+        gigByte = round(lower, 1)
+        print('RAM = ', gigByte, 'GB')
 
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-
-    def ram_find(self):
-        mem = virtual_memory()
-        lower = mem.total / 1000000000
-        gigByte = round(lower, 1)
-        print('RAM size = ', gigByte, 'GB')
-
 
 # Third Window
 
