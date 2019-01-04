@@ -37,11 +37,10 @@ class Window(QWidget and QMainWindow):
         runbtn.move(350, 400)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
-        runbtn.clicked.connect(self.A_gpu_util_timer)
-
+#        runbtn.clicked.connect(self.A_gpu_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
-        runbtn.clicked.connect(self.gpu_util_mean)
+#        runbtn.clicked.connect(self.gpu_util_mean)
 
         heaven = QPushButton('Benchmark', self)
         heaven.resize(heaven.sizeHint())
@@ -56,15 +55,10 @@ class Window(QWidget and QMainWindow):
         dropDown.setObjectName('GPU brand')
         dropDown.setGeometry(250, 350, 90, 25)
 
-        graph = QPushButton('CPU/GPU Graph', self)
+        graph = QPushButton('Graph', self)
         graph.resize(graph.sizeHint())
         graph.move(200, 200)
         graph.clicked.connect(self.output_util_graphs())
-
-        graph2 = QPushButton('RAM Graph', self)
-        graph2.resize(graph2.sizeHint())
-        graph2.move(200, 250)
-        graph2.clicked.connect(self.output_ram_util_graphs())
 
 # PC Buttons
 
@@ -105,6 +99,8 @@ class Window(QWidget and QMainWindow):
             Graph_Util.cpu_y.append(psutil.cpu_percent())
             Graph_Util.time_x.append(n)
             time.sleep(1)
+        print(Graph_Util.cpu_y)
+        print(Graph_Util.time_x)
         print('cpu done')
 
     def cpu_util_mean(self):
@@ -123,7 +119,6 @@ class Window(QWidget and QMainWindow):
             GPUs = GPUtil.getGPUs()
             gpu_load = GPUs[0].load
             Graph_Util.gpu_y.append(gpu_load)
-            Graph_Util.time_x.append(n)
             time.sleep(1)
         print(Graph_Util.gpu_y)
         print('gpu done')
@@ -153,6 +148,15 @@ class Window(QWidget and QMainWindow):
 
 # ram
 
+    def ram_util_timer(self):
+        mem = virtual_memory()
+        for x in range(10):
+            Graph_Util.ram_y.append(mem.percent)
+            time.sleep(1)
+        print(Graph_Util.ram_y)
+        print(Graph_Util.time_x)
+        print('ram done')
+
     def ram_util_mean(self):
         length = len(Graph_Util.ram_y)
         product = 0
@@ -161,14 +165,6 @@ class Window(QWidget and QMainWindow):
         mean = product / length
         rounded_mean = round(mean, 3)
         print('Average RAM utilisation =', rounded_mean,'%')
-
-    def ram_util_timer(self):
-        mem = virtual_memory()
-        for z in range(10):
-            Graph_Util.ram_y.append(mem.percent)
-            Graph_Util.ram_time_x.append(z)
-            time.sleep(1)
-        print('ram done')
 
 # benchmark
 
@@ -179,13 +175,6 @@ class Window(QWidget and QMainWindow):
 
     def output_util_graphs(self):
         return Graph_Util.util_graphs
-
-    def output_ram_util_graphs(self):
-        return Graph_Util.ram_util_graph
-
-    def buttonClicked(self):
-        sender = self.sender()
-        self.statusBar().showMessage(sender.text() + ' was pressed')
 
     def center(self):
         qr = self.frameGeometry()
