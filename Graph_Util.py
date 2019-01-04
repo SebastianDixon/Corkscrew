@@ -5,11 +5,10 @@ import pyqtgraph.exporters
 import numpy as np
 
 cpu_y = []
-gpu_y = []
+gpu_y = [0,1,2,3,4,5,6,7,8,9]
+ram_y = []
 time_x = []
 
-ram_y = []
-ram_time_x = []
 
 def util_graphs():
     plt = pg.plot()
@@ -18,18 +17,9 @@ def util_graphs():
     plt.setLabel('left', 'Utilisation', units='%')
     plt.setLabel('bottom', 'Time', units='s')
     plt.setWindowTitle('Utilisation %')
-
-    line_1 = plt.plot(time_x, cpu_y, pen='b', symbol='x', symbolPen='b', symbolBrush=0.2, name='cpu')
-    line_2 = plt.plot(time_x, gpu_y, pen='r', symbol='o', symbolPen='r', symbolBrush=0.2, name='gpu')
-
-def ram_util_graph():
-    plt = pg.plot()
-    plt.addLegend()
-    plt.showGrid(x=True,y=True)
-    plt.setLabel('left', 'Utilisation', units='%')
-    plt.setLabel('bottom', 'Time', units='s')
-    plt.setWindowTitle('RAM Utilisation %')
-    plt.plot(ram_time_x, ram_y, pen='b', symbol='x', symbolPen='b', symbolBrush=0.2, name='ram')
+    plt.plot(time_x, cpu_y, pen='b', symbol='x', symbolPen='b', symbolBrush=0.2, name='cpu')
+    plt.plot(time_x, gpu_y, pen='r', symbol='o', symbolPen='r', symbolBrush=0.2, name='gpu')
+    plt.plot(time_x, ram_y, pen='g', symbol='x', symbolPen='g', symbolBrush=0.2, name='ram')
 
 if __name__ == '__main__':
     import sys
