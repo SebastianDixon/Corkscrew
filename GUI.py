@@ -4,7 +4,7 @@ import cpuinfo
 import os
 import psutil
 import GPUtil
-from pyadl import *
+# from pyadl import *
 from psutil import virtual_memory
 import sys
 from PyQt5 import QtCore, QtWidgets
@@ -13,7 +13,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import time
 
-# First Window
+# ------------------ First Window -------------------
 
 class Window(QWidget and QMainWindow):
 
