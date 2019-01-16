@@ -3,6 +3,7 @@ import Graph_Util
 import cpuinfo
 import os
 import psutil
+import subprocess
 import GPUtil
 # from pyadl import *
 from psutil import virtual_memory
@@ -45,7 +46,7 @@ class Window(QWidget and QMainWindow):
         heaven = QPushButton('Benchmark', self)
         heaven.resize(heaven.sizeHint())
         heaven.move(350, 350)
-        heaven.clicked.connect(self.open_heaven)
+        heaven.clicked.connect(self.open_heaven_mac)
 
 # analysis button
 
@@ -171,6 +172,10 @@ class Window(QWidget and QMainWindow):
     def open_heaven(self):
         os.startfile('C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Unigine/Heaven Benchmark 4.0/Heaven Benchmark 4.0.lnk')
 
+    def open_heaven_mac(self):
+        subprocess.call(
+            ["/usr/bin/open", "-W", "-n", "-a", "/Applications/Heaven.app"])
+
 # random
 
     def output_util_graphs(self):
@@ -188,8 +193,6 @@ class Window(QWidget and QMainWindow):
     def create_leader_window(self):
         self.next = LeadWindow()
 
-# Second Window
-
 
 class PcWindow(QMainWindow):
 
@@ -198,50 +201,67 @@ class PcWindow(QMainWindow):
         self.Secondwindow()
 
     def Secondwindow(self):
-        self.resize(350, 480)
-        self.center()
-        self.setWindowTitle('My PC')
+        self.resize(240, 460)
 
+#cpu
+        self.cpu1btn = QPushButton('CPU Type', self)
+        self.cpu1btn.sizeHint()
+        self.cpu1btn.move(0,0)
+        self.cpu1btn.clicked.connect(self.cpu_name)
+        self.cpu_box = QTextEdit(self)
+        self.cpu_box.move(120,0)
+        self.cpu_box.setPlaceholderText('CPU')
 
-        cpu1btn = QPushButton('CPU Type', self)
-        cpu1btn.clicked.connect(self.cpu_name)
-        cpu1btn.resize(cpu1btn.sizeHint())
-        cpu1btn.move(40, 25)
+#gpu
+        self.gpu1btn = QPushButton('AMD GPU', self)
+        self.gpu1btn.sizeHint()
+        self.gpu1btn.move(0, 120)
+        self.gpu1btn.clicked.connect(self.A_gpu_name)
+        self.gpu_box = QTextEdit(self)
+        self.gpu_box.setPlaceholderText('GPU')
+        self.gpu_box.move(120, 120)
 
-        gpu1btn = QPushButton('AMD GPU Type', self)
-        gpu1btn.clicked.connect(self.A_gpu_name)
-        gpu1btn.resize(gpu1btn.sizeHint())
-        gpu1btn.move(40, 75)
+        self.gpu2btn = QPushButton('NVIDIA GPU', self)
+        self.gpu2btn.sizeHint()
+        self.gpu2btn.move(0, 240)
+        self.gpu2btn.clicked.connect(self.N_gpu_name)
+        self.gpu2_box = QTextEdit(self)
+        self.gpu2_box.setPlaceholderText('GPU')
+        self.gpu2_box.move(120, 240)
 
-        ramBtn = QPushButton('RAM quantity', self)
-        ramBtn.resize(ramBtn.sizeHint())
-        ramBtn.move(40, 125)
-        ramBtn.clicked.connect(self.ram_find)
-
+#ram
+        self.rambtn = QPushButton('RAM', self)
+        self.rambtn.sizeHint()
+        self.rambtn.move(0, 360)
+        self.rambtn.clicked.connect(self.ram_find)
+        self.ram_box = QTextEdit(self)
+        self.ram_box.move(120, 360)
+        self.ram_box.setPlaceholderText('RAM')
 
         self.show()
 
-# functions
+    # functions
 
     def cpu_name(self):
-        print('CPU = ',cpuinfo.get_cpu_info()['brand'])
+        output = cpuinfo.get_cpu_info()['brand']
+        self.cpu_box.insertPlainText(output)
 
     def A_gpu_name(self):
-        print('GPU = ', ADLManager.getInstance().getDevices()[0].adapterName)
+        output = ADLManager.getInstance().getDevices()[0].adapterName
+        self.gpu_box.insertPlainText(output)
+
+    def N_gpu_name(self):
+        output = 'nvidia gpu'
+        self.gpu2_box.insertPlainText(output)
 
     def ram_find(self):
         mem = virtual_memory()
         lower = mem.total / 1000000000
         gigByte = round(lower, 1)
-        print('RAM = ', gigByte, 'GB')
-
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-
-# Third Window
+        output = str(gigByte)
+        units = ' GB'
+        self.ram_box.insertPlainText(output)
+        self.ram_box.insertPlainText(units)
 
 
 class LeadWindow(QMainWindow):
