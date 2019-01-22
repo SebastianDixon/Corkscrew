@@ -1,11 +1,12 @@
 import Graph_Util
 
+from bs4 import BeautifulSoup
 import cpuinfo
 import os
 import psutil
 import subprocess
 import GPUtil
-# from pyadl import *
+#from pyadl import *
 from psutil import virtual_memory
 import sys
 from PyQt5 import QtCore, QtWidgets
@@ -36,9 +37,10 @@ class Window(QWidget and QMainWindow):
         runbtn = QPushButton('Utilisation', self)
         runbtn.resize(runbtn.sizeHint())
         runbtn.move(350, 400)
+
+        runbtn.clicked.connect(self.gpu_dropDown)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
-#        runbtn.clicked.connect(self.A_gpu_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
 #        runbtn.clicked.connect(self.gpu_util_mean)
@@ -50,16 +52,15 @@ class Window(QWidget and QMainWindow):
 
 # analysis button
 
-        dropDown = QComboBox(self)
-        dropDown.addItem('Nvidia')
-        dropDown.addItem('AMD')
-        dropDown.setObjectName('GPU brand')
-        dropDown.setGeometry(250, 350, 90, 25)
-
         graph = QPushButton('Graph', self)
         graph.resize(graph.sizeHint())
         graph.move(200, 200)
         graph.clicked.connect(self.output_util_graphs())
+
+        file = QPushButton('File', self)
+        file.resize(file.sizeHint())
+        file.move(300, 200)
+        file.clicked.connect(self.openFile)
 
 # PC Buttons
 
@@ -115,6 +116,16 @@ class Window(QWidget and QMainWindow):
 
 # gpu
 
+    def gpu_dropDown(self):
+        items = ('Nvidia', 'AMD')
+        item, okPressed = QInputDialog.getItem(self, "Get item", "GPU:", items, 0, False)
+        if okPressed and item:
+            print(item)
+#            if item == ('Nvidia'):
+#                self.N_gpu_util_timer()
+#            else:
+#                self.A_gpu_util_timer()
+
     def N_gpu_util_timer(self):
         for n in range(10):
             GPUs = GPUtil.getGPUs()
@@ -122,7 +133,7 @@ class Window(QWidget and QMainWindow):
             Graph_Util.gpu_y.append(gpu_load)
             time.sleep(1)
         print(Graph_Util.gpu_y)
-        print('gpu done')
+        print('N gpu done')
 
     def A_gpu_util_timer(self):
         for n in range(10):
@@ -130,13 +141,7 @@ class Window(QWidget and QMainWindow):
             Graph_Util.time_x.append(n)
             time.sleep(1)
         print(Graph_Util.gpu_y)
-        print('gpu done')
-
-#    def gpu_choice(self):
-#        if choice == ('Nvidia'):
-#            self.N_gpu_util_timer()
-#        else:
-#            self.A_gpu_util_timer()
+        print('A gpu done')
 
     def gpu_util_mean(self):
         length = len(Graph_Util.gpu_y)
@@ -170,11 +175,23 @@ class Window(QWidget and QMainWindow):
 # benchmark
 
     def open_heaven(self):
-        os.startfile('C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Unigine/Heaven Benchmark 4.0/Heaven Benchmark 4.0.lnk')
+        os.startfile(
+            'C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Unigine/Heaven Benchmark 4.0/Heaven Benchmark 4.0.lnk')
 
     def open_heaven_mac(self):
         subprocess.call(
             ["/usr/bin/open", "-W", "-n", "-a", "/Applications/Heaven.app"])
+
+#file system
+
+    def openFile(self):
+        options = QFileDialog.Options()
+
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                                              "All Files (*);;Python Files (*.py)", options=options)
+        if fileName:
+            print(fileName)
 
 # random
 
