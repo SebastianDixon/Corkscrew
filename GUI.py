@@ -1,12 +1,12 @@
 import Graph_Util
 
 from bs4 import BeautifulSoup
+import pyadl
 import cpuinfo
 import os
 import psutil
 import subprocess
 import GPUtil
-#from pyadl import *
 from psutil import virtual_memory
 import sys
 from PyQt5 import QtCore, QtWidgets
@@ -43,12 +43,12 @@ class Window(QWidget and QMainWindow):
         runbtn.clicked.connect(self.ram_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
-#        runbtn.clicked.connect(self.gpu_util_mean)
+        runbtn.clicked.connect(self.gpu_util_mean)
 
         heaven = QPushButton('Benchmark', self)
         heaven.resize(heaven.sizeHint())
         heaven.move(350, 350)
-        heaven.clicked.connect(self.open_heaven_mac)
+        heaven.clicked.connect(self.open_heaven)
 
 # analysis button
 
@@ -121,10 +121,10 @@ class Window(QWidget and QMainWindow):
         item, okPressed = QInputDialog.getItem(self, "Get item", "GPU:", items, 0, False)
         if okPressed and item:
             print(item)
-#            if item == ('Nvidia'):
-#                self.N_gpu_util_timer()
-#            else:
-#                self.A_gpu_util_timer()
+            if item == ('Nvidia'):
+                self.N_gpu_util_timer()
+            else:
+                self.A_gpu_util_timer()
 
     def N_gpu_util_timer(self):
         for n in range(10):
@@ -137,7 +137,7 @@ class Window(QWidget and QMainWindow):
 
     def A_gpu_util_timer(self):
         for n in range(10):
-            Graph_Util.gpu_y.append(ADLDevice.getCurrentUsage)
+            Graph_Util.gpu_y.append(pyadl.ADLDevice.getCurrentUsage)
             Graph_Util.time_x.append(n)
             time.sleep(1)
         print(Graph_Util.gpu_y)
@@ -264,7 +264,7 @@ class PcWindow(QMainWindow):
         self.cpu_box.insertPlainText(output)
 
     def A_gpu_name(self):
-        output = ADLManager.getInstance().getDevices()[0].adapterName
+        output = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
         self.gpu_box.insertPlainText(output)
 
     def N_gpu_name(self):
