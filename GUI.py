@@ -1,7 +1,9 @@
 import Graph_Util
 
-from bs4 import BeautifulSoup
-import pyadl
+# import pyadl
+from lxml import etree
+import lxml
+from io import StringIO
 import cpuinfo
 import os
 import psutil
@@ -14,6 +16,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import time
+from bs4 import BeautifulSoup
+
 
 # ------------------ First Window -------------------
 
@@ -43,7 +47,8 @@ class Window(QWidget and QMainWindow):
         runbtn.clicked.connect(self.ram_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
-        runbtn.clicked.connect(self.gpu_util_mean)
+#        runbtn.clicked.connect(self.gpu_util_mean)
+        # all these components dont run simultaneously
 
         heaven = QPushButton('Benchmark', self)
         heaven.resize(heaven.sizeHint())
@@ -137,7 +142,7 @@ class Window(QWidget and QMainWindow):
 
     def A_gpu_util_timer(self):
         for n in range(10):
-            Graph_Util.gpu_y.append(pyadl.ADLDevice.getCurrentUsage)
+            Graph_Util.gpu_y.append(pyadl.ADLDevice.getCurrentUsage())
             Graph_Util.time_x.append(n)
             time.sleep(1)
         print(Graph_Util.gpu_y)
@@ -191,7 +196,17 @@ class Window(QWidget and QMainWindow):
         fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
                                               "All Files (*);;Python Files (*.py)", options=options)
         if fileName:
-            print(fileName)
+            file = open(fileName)
+            data = file.read()
+            soup = BeautifulSoup(data,"lxml")
+            results = []
+            for item in soup.find_all('strong'):
+                results.append(float(item.text))
+            self.averageFps = results[0]
+            self.score = results[1]
+        print('Fps =',self.averageFps)
+        print('Score =',self.score)
+
 
 # random
 
@@ -264,12 +279,20 @@ class PcWindow(QMainWindow):
         self.cpu_box.insertPlainText(output)
 
     def A_gpu_name(self):
-        output = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
-        self.gpu_box.insertPlainText(output)
+        try:
+            output = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
+            self.gpu_box.insertPlainText(output)
+        except:
+            self.gpu_box.insertPlainText('amd gpu')
 
     def N_gpu_name(self):
-        output = 'nvidia gpu'
-        self.gpu2_box.insertPlainText(output)
+        try:
+            output = GPUtil.GPU.name
+            self.gpu2_box.insertPlainText(output)
+        except:
+            self.gpu2_box.insertPlainText('nvidia gpu')
+
+
 
     def ram_find(self):
         mem = virtual_memory()
@@ -308,5 +331,3 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
     execute = Window()
     sys.exit(app.exec_())
-
-
