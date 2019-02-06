@@ -33,6 +33,10 @@ class Window(QWidget and QMainWindow):
         self.setWindowTitle('Corkscrew')
         self.statusBar()
 
+        palette = QPalette()
+        palette.setColor(QPalette.Background, QColor("#a42600"))
+        self.setPalette(palette)
+
         qbtn = QPushButton('Quit', self)
         qbtn.resize(qbtn.sizeHint())
         qbtn.move(350, 50)
@@ -48,7 +52,7 @@ class Window(QWidget and QMainWindow):
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
 #        runbtn.clicked.connect(self.gpu_util_mean)
-        # all these components dont run simultaneously
+
 
         heaven = QPushButton('Benchmark', self)
         heaven.resize(heaven.sizeHint())
@@ -86,7 +90,6 @@ class Window(QWidget and QMainWindow):
         leadBtn.resize(leadBtn.sizeHint())
         leadBtn.move(200, 50)
         leadBtn.clicked.connect(self.create_leader_window)
-
 
         self.show()
 
@@ -208,6 +211,8 @@ class Window(QWidget and QMainWindow):
         print('Score =',self.score)
 
 
+
+
 # random
 
     def output_util_graphs(self):
@@ -233,7 +238,12 @@ class PcWindow(QMainWindow):
         self.Secondwindow()
 
     def Secondwindow(self):
-        self.resize(240, 460)
+        self.resize(240, 450)
+        self.center()
+
+        palette = QPalette()
+        palette.setColor(QPalette.Background, QColor("#a2a400"))
+        self.setPalette(palette)
 
 #cpu
         self.cpu1btn = QPushButton('CPU Type', self)
@@ -303,6 +313,11 @@ class PcWindow(QMainWindow):
         self.ram_box.insertPlainText(output)
         self.ram_box.insertPlainText(units)
 
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
 class LeadWindow(QMainWindow):
 
@@ -314,6 +329,10 @@ class LeadWindow(QMainWindow):
         self.resize(350, 480)
         self.center()
         self.setWindowTitle('Leaderboard')
+
+        palette = QPalette()
+        palette.setColor(QPalette.Background, QColor("#f441f4"))
+        self.setPalette(palette)
 
         self.show()
 
