@@ -1,9 +1,6 @@
-import Graph_Util
-
+import Graph
+import Database
 # import pyadl
-from lxml import etree
-import lxml
-from io import StringIO
 import cpuinfo
 import os
 import psutil
@@ -11,10 +8,8 @@ import subprocess
 import GPUtil
 from psutil import virtual_memory
 import sys
-from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtCore import *
 import time
 from bs4 import BeautifulSoup
 
@@ -46,7 +41,7 @@ class Window(QWidget and QMainWindow):
         runbtn.resize(runbtn.sizeHint())
         runbtn.move(350, 400)
 
-        runbtn.clicked.connect(self.gpu_dropDown)
+#        runbtn.clicked.connect(self.gpu_dropDown)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
@@ -106,18 +101,18 @@ class Window(QWidget and QMainWindow):
 
     def cpu_util_timer(self):
         for n in range(10):
-            Graph_Util.cpu_y.append(psutil.cpu_percent())
-            Graph_Util.time_x.append(n)
+            Graph.cpu_y.append(psutil.cpu_percent())
+            Graph.time_x.append(n)
             time.sleep(1)
-        print(Graph_Util.cpu_y)
-        print(Graph_Util.time_x)
+        print(Graph.cpu_y)
+        print(Graph.time_x)
         print('cpu done')
 
     def cpu_util_mean(self):
-        length = len(Graph_Util.cpu_y)
+        length = len(Graph.cpu_y)
         product = 0
         for x in range(length):
-            product = product + Graph_Util.cpu_y[x]
+            product = product + Graph.cpu_y[x]
         mean = product / length
         rounded_mean = round(mean, 3)
         print('Average CPU utilisation =', rounded_mean,'%')
@@ -138,24 +133,24 @@ class Window(QWidget and QMainWindow):
         for n in range(10):
             GPUs = GPUtil.getGPUs()
             gpu_load = GPUs[0].load
-            Graph_Util.gpu_y.append(gpu_load)
+            Graph.gpu_y.append(gpu_load)
             time.sleep(1)
-        print(Graph_Util.gpu_y)
+        print(Graph.gpu_y)
         print('N gpu done')
 
     def A_gpu_util_timer(self):
         for n in range(10):
-            Graph_Util.gpu_y.append(pyadl.ADLDevice.getCurrentUsage())
-            Graph_Util.time_x.append(n)
+            Graph.gpu_y.append(pyadl.ADLDevice.getCurrentUsage())
+            Graph.time_x.append(n)
             time.sleep(1)
-        print(Graph_Util.gpu_y)
+        print(Graph.gpu_y)
         print('A gpu done')
 
     def gpu_util_mean(self):
-        length = len(Graph_Util.gpu_y)
+        length = len(Graph.gpu_y)
         product = 0
         for x in range(0, length):
-            product = product + Graph_Util.gpu_y[x]
+            product = product + Graph.gpu_y[x]
         mean = product / length
         rounded_mean = round(mean, 3)
         print('Average GPU utilisation =', rounded_mean,'%')
@@ -165,17 +160,17 @@ class Window(QWidget and QMainWindow):
     def ram_util_timer(self):
         mem = virtual_memory()
         for x in range(10):
-            Graph_Util.ram_y.append(mem.percent)
+            Graph.ram_y.append(mem.percent)
             time.sleep(1)
-        print(Graph_Util.ram_y)
-        print(Graph_Util.time_x)
+        print(Graph.ram_y)
+        print(Graph.time_x)
         print('ram done')
 
     def ram_util_mean(self):
-        length = len(Graph_Util.ram_y)
+        length = len(Graph.ram_y)
         product = 0
         for x in range(0, length):
-            product = product + Graph_Util.ram_y[x]
+            product = product + Graph.ram_y[x]
         mean = product / length
         rounded_mean = round(mean, 3)
         print('Average RAM utilisation =', rounded_mean,'%')
@@ -211,12 +206,10 @@ class Window(QWidget and QMainWindow):
         print('Score =',self.score)
 
 
-
-
 # random
 
     def output_util_graphs(self):
-        return Graph_Util.util_graphs
+        return Graph.util_graphs
 
     def center(self):
         qr = self.frameGeometry()
