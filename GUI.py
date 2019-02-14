@@ -207,6 +207,8 @@ class Window(QWidget and QMainWindow):
         print('Score =',self.score)
 
 
+
+
 # random
 
     def output_util_graphs(self):

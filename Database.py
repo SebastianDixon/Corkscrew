@@ -1,6 +1,4 @@
 import pymysql.cursors
-
-
 # Connect to the database
 connection = pymysql.connect(host='localhost',
                              user='root',
