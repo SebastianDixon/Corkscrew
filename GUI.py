@@ -14,10 +14,11 @@ from PyQt5.QtGui import *
 import time
 from bs4 import BeautifulSoup
 
-
 # ------------------ First Window -------------------
 
-class Window(QWidget and QMainWindow):
+
+class Window(QWidget and  QMainWindow):
+
 
     def __init__(self):
         super().__init__()
@@ -65,7 +66,8 @@ class Window(QWidget and QMainWindow):
         file = QPushButton('File', self)
         file.resize(file.sizeHint())
         file.move(300, 200)
-        file.clicked.connect(self.openFile)
+        file.clicked.connect(self.openFile2)
+        file.clicked.connect(self.input_database2)
 
 # PC Buttons
 
@@ -179,40 +181,23 @@ class Window(QWidget and QMainWindow):
 # benchmark
 
     def open_heaven(self):
-        os.startfile(
-            'C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Unigine/Heaven Benchmark 4.0/Heaven Benchmark 4.0.lnk')
-
-    def open_heaven_mac(self):
-        subprocess.call(
-            ["/usr/bin/open", "-W", "-n", "-a", "/Applications/Heaven.app"])
-
-#file system
-
-    def openFile(self):
-        options = QFileDialog.Options()
-
-        options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
-                                              "All Files (*);;Python Files (*.py)", options=options)
-        if fileName:
-            file = open(fileName)
-            data = file.read()
-            soup = BeautifulSoup(data,"lxml")
-            results = []
-            for item in soup.find_all('strong'):
-                results.append(float(item.text))
-            self.averageFps = results[0]
-            self.score = results[1]
-        print('Fps =',self.averageFps)
-        print('Score =',self.score)
-
-
-
+        try:
+            os.startfile(
+                'C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Unigine/Heaven Benchmark 4.0/Heaven Benchmark 4.0.lnk')
+        except:
+            subprocess.call(
+                ["/usr/bin/open", "-W", "-n", "-a", "/Applications/Heaven.app"])
 
 # random
 
     def output_util_graphs(self):
         return Graph.util_graphs
+
+    def openFile2(self):
+        return Database.openFile(self)
+
+    def input_database2(self):
+        return Database.write_database()
 
     def center(self):
         qr = self.frameGeometry()
