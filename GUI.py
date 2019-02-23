@@ -63,11 +63,16 @@ class Window(QWidget and  QMainWindow):
         graph.move(200, 200)
         graph.clicked.connect(self.output_util_graphs())
 
-        file = QPushButton('File', self)
+        file = QPushButton('Open File', self)
         file.resize(file.sizeHint())
         file.move(300, 200)
         file.clicked.connect(self.openFile2)
         file.clicked.connect(self.input_database2)
+
+        file2 = QPushButton('Read Lead.', self)
+        file2.resize(file.sizeHint())
+        file2.move(300, 250)
+        file2.clicked.connect(self.read_database2)
 
 # PC Buttons
 
@@ -198,6 +203,9 @@ class Window(QWidget and  QMainWindow):
 
     def input_database2(self):
         return Database.write_database()
+
+    def read_database2(self):
+        return Database.read_database_prompt()
 
     def center(self):
         qr = self.frameGeometry()

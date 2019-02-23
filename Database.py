@@ -39,7 +39,7 @@ def write_database():
 def read_database():
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT `SCORE`, `FPS` FROM `Leaderboard` WHERE `POSITION`= %s"
+            sql = "SELECT `CPU`, `GPU`, `SCORE`, `FPS` FROM `Leaderboard` WHERE `POSITION`= %s"
             cursor.execute(sql, (1,))
             result = cursor.fetchone()
         print(result)
@@ -47,4 +47,14 @@ def read_database():
     finally:
         connection.close()
 
-read_database()
+def read_database_prompt():
+    pos = int(input('Which row? '))
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT `CPU`, `GPU`, `SCORE`, `FPS` FROM `Leaderboard` WHERE `POSITION`= %s"
+            cursor.execute(sql, (pos,))
+            result = cursor.fetchone()
+        print(result)
+
+    finally:
+        connection.close()
