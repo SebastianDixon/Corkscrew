@@ -39,7 +39,7 @@ class Window(QWidget and  QMainWindow):
         qbtn.move(350, 50)
         qbtn.clicked.connect(self.exit_app)
 
-        runbtn = QPushButton('Utilisation', self)
+        runbtn = QPushButton('Run', self)
         runbtn.resize(runbtn.sizeHint())
         runbtn.move(350, 400)
 
@@ -49,6 +49,8 @@ class Window(QWidget and  QMainWindow):
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
 #        runbtn.clicked.connect(self.gpu_util_mean)
+        runbtn.clicked.connect(self.openFile2)
+        runbtn.clicked.connect(self.input_database2)
 
 
         heaven = QPushButton('Benchmark', self)
@@ -62,17 +64,6 @@ class Window(QWidget and  QMainWindow):
         graph.resize(graph.sizeHint())
         graph.move(200, 200)
         graph.clicked.connect(self.output_util_graphs())
-
-        file = QPushButton('Open File', self)
-        file.resize(file.sizeHint())
-        file.move(300, 200)
-        file.clicked.connect(self.openFile2)
-        file.clicked.connect(self.input_database2)
-
-        file2 = QPushButton('Read Lead.', self)
-        file2.resize(file.sizeHint())
-        file2.move(300, 250)
-        file2.clicked.connect(self.read_database2)
 
 # PC Buttons
 
@@ -104,6 +95,13 @@ class Window(QWidget and  QMainWindow):
             sys.exit()
         else:
             print('Application Not Quit')
+
+    def openFile2(self):
+        return Database.openFile(self)
+
+    def input_database2(self):
+        return Database.write_database()
+
 
 # cpu
 
@@ -188,7 +186,8 @@ class Window(QWidget and  QMainWindow):
     def open_heaven(self):
         try:
             os.startfile(
-                'C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Unigine/Heaven Benchmark 4.0/Heaven Benchmark 4.0.lnk')
+                'C:/ProgramData/Microsoft/Windows/Start Menu/'
+                'Programs/Unigine/Heaven Benchmark 4.0/Heaven Benchmark 4.0.lnk')
         except:
             subprocess.call(
                 ["/usr/bin/open", "-W", "-n", "-a", "/Applications/Heaven.app"])
@@ -274,8 +273,10 @@ class PcWindow(QMainWindow):
     # functions
 
     def cpu_name(self):
-        output = cpuinfo.get_cpu_info()['brand']
-        self.cpu_box.insertPlainText(output)
+        before = cpuinfo.get_cpu_info()['brand']
+        after = before.split(' ')
+        model = after[2].split('-')[1]
+        self.cpu_box.insertPlainText(model)
 
     def A_gpu_name(self):
         try:
@@ -308,7 +309,8 @@ class PcWindow(QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-class LeadWindow(QMainWindow):
+
+class LeadWindow(QMainWindow and QWidget):
 
     def __init__(self):
         super().__init__()
@@ -323,6 +325,22 @@ class LeadWindow(QMainWindow):
         palette.setColor(QPalette.Background, QColor("#f441f4"))
         self.setPalette(palette)
 
+        file = QPushButton('Write Lead.', self)
+        file.resize(file.sizeHint())
+        file.move(100, 100)
+        file.clicked.connect(self.openFile2)
+        file.clicked.connect(self.input_database2)
+
+        file3 = QPushButton('CPU search.', self)
+        file3.resize(file3.sizeHint())
+        file3.move(100, 200)
+        file3.clicked.connect(self.cpu_search_database2)
+
+        file4 = QPushButton('GPU search.', self)
+        file4.resize(file4.sizeHint())
+        file4.move(200, 200)
+        file4.clicked.connect(self.gpu_search_database2)
+
         self.show()
 
 # functions
@@ -332,6 +350,18 @@ class LeadWindow(QMainWindow):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    def openFile2(self):
+        return Database.openFile(self)
+
+    def input_database2(self):
+        return Database.write_database()
+
+    def cpu_search_database2(self):
+        return Database.cpu_search_database()
+
+    def gpu_search_database2(self):
+        return Database.gpu_search_database()
 
 
 if __name__ == '__main__':

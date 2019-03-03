@@ -26,33 +26,51 @@ def openFile(self):
     print('Score =', results[1])
     print('Fps =', results[0])
 
-def write_database():
+
+
+def cpu_search_database():
+    cpu = input('CPU name: ')
     try:
         with connection.cursor() as cursor:
-            sql = "INSERT INTO `Leaderboard` (`POSITION`,`SCORE`, `FPS`) VALUES (%s, %s, %s)"
-            cursor.execute(sql, ('101', results[1], results[0]))
+            sql = "SELECT `GPU` FROM `Leaderboard` WHERE `CPU`= %s"
+            cursor.execute(sql, (cpu,))
+            for row in cursor:
+                print(row['GPU'])
         connection.commit()
 
     finally:
         connection.close()
 
-def read_database():
+def gpu_search_database():
+    gpu = input('GPU name: ')
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT `CPU`, `GPU`, `SCORE`, `FPS` FROM `Leaderboard` WHERE `POSITION`= %s"
-            cursor.execute(sql, (1,))
-            result = cursor.fetchone()
-        print(result)
+            sql = "SELECT `CPU` FROM `Leaderboard` WHERE `GPU`= %s"
+            cursor.execute(sql, (gpu,))
+            for row in cursor:
+                print(row['CPU'])
+        connection.commit()
 
     finally:
         connection.close()
 
+def write_database():
+    try:
+        with connection.cursor() as cursor:
+            sql = "INSERT INTO `Leaderboard` (`CPU`,`GPU`,`SCORE`, `FPS`) VALUES (%s, %s,%s, %s)"
+            cursor.execute(sql, ('5257U', 'intel', results[1], results[0]))
+        connection.commit()
+
+    finally:
+        connection.close()
+
+
 def read_database_prompt():
-    pos = int(input('Which row? '))
+    pos = int(input('Which Position? :'))
     try:
         with connection.cursor() as cursor:
             sql = "SELECT `CPU`, `GPU`, `SCORE`, `FPS` FROM `Leaderboard` WHERE `POSITION`= %s"
-            cursor.execute(sql, (pos,))
+            cursor.execute(sql, (pos, ))
             result = cursor.fetchone()
         print(result)
 
