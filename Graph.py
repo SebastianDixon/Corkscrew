@@ -3,10 +3,9 @@ import pyqtgraph.exporters
 import numpy as np
 
 cpu_y = []
-gpu_y = []
+gpu_y = [0,2,3,4,5,6,7,8,9,0]
 ram_y = []
 time_x = []
-
 
 def util_graphs():
     plt = pg.plot()

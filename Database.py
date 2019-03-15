@@ -10,6 +10,8 @@ connection = pymysql.connect(host='localhost',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 results = []
+recommend_cpu = []
+recommend_gpu = []
 
 def openFile(self):
     options = QFileDialog.Options()
@@ -26,8 +28,6 @@ def openFile(self):
     print('Score =', results[1])
     print('Fps =', results[0])
 
-
-
 def cpu_search_database():
     cpu = input('CPU name: ')
     try:
@@ -35,7 +35,9 @@ def cpu_search_database():
             sql = "SELECT `GPU` FROM `Leaderboard` WHERE `CPU`= %s"
             cursor.execute(sql, (cpu,))
             for row in cursor:
+                recommend_gpu.append(row['GPU'])
                 print(row['GPU'])
+            print(recommend_gpu)
         connection.commit()
 
     finally:
@@ -48,7 +50,9 @@ def gpu_search_database():
             sql = "SELECT `CPU` FROM `Leaderboard` WHERE `GPU`= %s"
             cursor.execute(sql, (gpu,))
             for row in cursor:
+                recommend_cpu.append(row['CPU'])
                 print(row['CPU'])
+            print(recommend_cpu)
         connection.commit()
 
     finally:

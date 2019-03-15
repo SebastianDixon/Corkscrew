@@ -28,10 +28,9 @@ class Window(QWidget and  QMainWindow):
         self.resize(460, 450)
         self.center()
         self.setWindowTitle('Corkscrew')
-        self.statusBar()
 
         palette = QPalette()
-        palette.setColor(QPalette.Background, QColor("#a42600"))
+        palette.setColor(QPalette.Background, QColor("#92B6D5"))
         self.setPalette(palette)
 
         qbtn = QPushButton('Quit', self)
@@ -48,10 +47,8 @@ class Window(QWidget and  QMainWindow):
         runbtn.clicked.connect(self.ram_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
-#        runbtn.clicked.connect(self.gpu_util_mean)
-        runbtn.clicked.connect(self.openFile2)
-        runbtn.clicked.connect(self.input_database2)
-
+        runbtn.clicked.connect(self.gpu_util_mean)
+        runbtn.clicked.connect(self.util_difference)
 
         heaven = QPushButton('Benchmark', self)
         heaven.resize(heaven.sizeHint())
@@ -67,9 +64,6 @@ class Window(QWidget and  QMainWindow):
 
 # PC Buttons
 
-        Pc_Title = QLabel("PC", self)
-        Pc_Title.move(75, 20)
-
         pcbtn = QPushButton('Pc Summary', self)
         pcbtn.resize(pcbtn.sizeHint())
         pcbtn.move(40, 50)
@@ -77,17 +71,14 @@ class Window(QWidget and  QMainWindow):
 
 # Leaderboard Buttons
 
-        Lead_Title = QLabel("Leaderboard", self)
-        Lead_Title.move(210, 20)
-
-        leadBtn = QPushButton('Ranking', self)
+        leadBtn = QPushButton('Leaderboard', self)
         leadBtn.resize(leadBtn.sizeHint())
         leadBtn.move(200, 50)
         leadBtn.clicked.connect(self.create_leader_window)
 
         self.show()
 
-# functions
+# misc
 
     def exit_app(self):
         answer = QMessageBox.question(self, 'Exit', 'Are you sure?', QMessageBox.Yes | QMessageBox.No)
@@ -101,7 +92,6 @@ class Window(QWidget and  QMainWindow):
 
     def input_database2(self):
         return Database.write_database()
-
 
 # cpu
 
@@ -181,6 +171,24 @@ class Window(QWidget and  QMainWindow):
         rounded_mean = round(mean, 3)
         print('Average RAM utilisation =', rounded_mean,'%')
 
+# bottleneck
+
+    def util_difference(self):
+        c_length = len(Graph.cpu_y)
+        g_length = len(Graph.gpu_y)
+        cpu_total = 0
+        gpu_total = 0
+        for i in range(c_length):
+            cpu_total += Graph.cpu_y[i]
+        for x in range(g_length):
+            gpu_total += Graph.gpu_y[x]
+        cpu_average = cpu_total / len(Graph.cpu_y)
+        gpu_average = gpu_total / len(Graph.gpu_y)
+        if cpu_average > gpu_average:
+            print('aahhh your cpu is bottlenecking!')
+        else:
+            print('aahhh your gpu is bottlenecking!')
+
 # benchmark
 
     def open_heaven(self):
@@ -230,7 +238,7 @@ class PcWindow(QMainWindow):
         self.center()
 
         palette = QPalette()
-        palette.setColor(QPalette.Background, QColor("#a2a400"))
+        palette.setColor(QPalette.Background, QColor("#92B6D5"))
         self.setPalette(palette)
 
 #cpu
@@ -270,7 +278,7 @@ class PcWindow(QMainWindow):
 
         self.show()
 
-    # functions
+# functions
 
     def cpu_name(self):
         before = cpuinfo.get_cpu_info()['brand']
@@ -291,8 +299,6 @@ class PcWindow(QMainWindow):
             self.gpu2_box.insertPlainText(output)
         except:
             self.gpu2_box.insertPlainText('nvidia gpu')
-
-
 
     def ram_find(self):
         mem = virtual_memory()
@@ -322,7 +328,7 @@ class LeadWindow(QMainWindow and QWidget):
         self.setWindowTitle('Leaderboard')
 
         palette = QPalette()
-        palette.setColor(QPalette.Background, QColor("#f441f4"))
+        palette.setColor(QPalette.Background, QColor("#92B6D5"))
         self.setPalette(palette)
 
         file = QPushButton('Write Lead.', self)
