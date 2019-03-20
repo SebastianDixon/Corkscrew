@@ -16,9 +16,7 @@ from bs4 import BeautifulSoup
 
 # ------------------ First Window -------------------
 
-
 class Window(QWidget and  QMainWindow):
-
 
     def __init__(self):
         super().__init__()
@@ -42,7 +40,7 @@ class Window(QWidget and  QMainWindow):
         runbtn.resize(runbtn.sizeHint())
         runbtn.move(350, 400)
 
-#        runbtn.clicked.connect(self.gpu_dropDown)
+#       runbtn.clicked.connect(self.gpu_dropDown)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
@@ -77,6 +75,30 @@ class Window(QWidget and  QMainWindow):
         leadBtn.clicked.connect(self.create_leader_window)
 
         self.show()
+
+# bottleneck
+
+    def util_difference(self):
+        c_length = len(Graph.cpu_y)
+        g_length = len(Graph.gpu_y)
+        cpu_total = 0
+        gpu_total = 0
+
+        for i in range(c_length):
+            cpu_total += Graph.cpu_y[i]
+        for x in range(g_length):
+            gpu_total += Graph.gpu_y[x]
+        cpu_average = cpu_total / len(Graph.cpu_y)
+        gpu_average = gpu_total / len(Graph.gpu_y)
+        print('')
+        Database.openFile(self)
+        print('')
+        if cpu_average > gpu_average:
+            print('bottleneck = cpu')
+            Database.gpu_search_database()
+        else:
+            print('bottleneck = gpu')
+            Database.cpu_search_database()
 
 # misc
 
@@ -170,24 +192,6 @@ class Window(QWidget and  QMainWindow):
         mean = product / length
         rounded_mean = round(mean, 3)
         print('Average RAM utilisation =', rounded_mean,'%')
-
-# bottleneck
-
-    def util_difference(self):
-        c_length = len(Graph.cpu_y)
-        g_length = len(Graph.gpu_y)
-        cpu_total = 0
-        gpu_total = 0
-        for i in range(c_length):
-            cpu_total += Graph.cpu_y[i]
-        for x in range(g_length):
-            gpu_total += Graph.gpu_y[x]
-        cpu_average = cpu_total / len(Graph.cpu_y)
-        gpu_average = gpu_total / len(Graph.gpu_y)
-        if cpu_average > gpu_average:
-            print('aahhh your cpu is bottlenecking!')
-        else:
-            print('aahhh your gpu is bottlenecking!')
 
 # benchmark
 
