@@ -23,24 +23,18 @@ class Window(QWidget and  QMainWindow):
         self.window()
 
     def window(self):
-        self.resize(460, 450)
+        self.resize(250, 250)
         self.center()
         self.setWindowTitle('Corkscrew')
 
-        palette = QPalette()
-        palette.setColor(QPalette.Background, QColor("#92B6D5"))
-        self.setPalette(palette)
-
-        qbtn = QPushButton('Quit', self)
-        qbtn.resize(qbtn.sizeHint())
-        qbtn.move(350, 50)
+        qbtn = QPushButton('Exit', self)
+        qbtn.setGeometry(180,190, 50,30) #geometry(x,y, width,height)
         qbtn.clicked.connect(self.exit_app)
 
-        runbtn = QPushButton('Run', self)
-        runbtn.resize(runbtn.sizeHint())
-        runbtn.move(350, 400)
-
+        runbtn = QPushButton('RUNRUNRUNRUNRUNRUNRUN', self)
+        runbtn.setGeometry(20,20, 210,30)
 #       runbtn.clicked.connect(self.gpu_dropDown)
+        runbtn.clicked.connect(self.open_heaven)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
@@ -48,30 +42,25 @@ class Window(QWidget and  QMainWindow):
         runbtn.clicked.connect(self.gpu_util_mean)
         runbtn.clicked.connect(self.util_difference)
 
-        heaven = QPushButton('Benchmark', self)
-        heaven.resize(heaven.sizeHint())
-        heaven.move(350, 350)
-        heaven.clicked.connect(self.open_heaven)
-
 # analysis button
 
         graph = QPushButton('Graph', self)
         graph.resize(graph.sizeHint())
-        graph.move(200, 200)
+        graph.move(20, 150)
         graph.clicked.connect(self.output_util_graphs())
 
 # PC Buttons
 
-        pcbtn = QPushButton('Pc Summary', self)
+        pcbtn = QPushButton('Pc Parts', self)
         pcbtn.resize(pcbtn.sizeHint())
-        pcbtn.move(40, 50)
+        pcbtn.move(20, 90)
         pcbtn.clicked.connect(self.create_window)
 
 # Leaderboard Buttons
 
-        leadBtn = QPushButton('Leaderboard', self)
+        leadBtn = QPushButton('Database', self)
         leadBtn.resize(leadBtn.sizeHint())
-        leadBtn.move(200, 50)
+        leadBtn.move(150, 90)
         leadBtn.clicked.connect(self.create_leader_window)
 
         self.show()
@@ -100,6 +89,10 @@ class Window(QWidget and  QMainWindow):
             print('bottleneck = gpu')
             Database.cpu_search_database()
 
+        self.result_box = QTextEdit(self)
+        self.result_box.move(120, 0)
+        self.result_box.setPlaceholderText('CPU')
+
 # misc
 
     def exit_app(self):
@@ -107,7 +100,7 @@ class Window(QWidget and  QMainWindow):
         if answer == QMessageBox.Yes:
             sys.exit()
         else:
-            print('Application Not Quit')
+            print('Application Not Closed')
 
     def openFile2(self):
         return Database.openFile(self)
@@ -241,10 +234,6 @@ class PcWindow(QMainWindow):
         self.resize(240, 450)
         self.center()
 
-        palette = QPalette()
-        palette.setColor(QPalette.Background, QColor("#92B6D5"))
-        self.setPalette(palette)
-
 #cpu
         self.cpu1btn = QPushButton('CPU Type', self)
         self.cpu1btn.sizeHint()
@@ -329,11 +318,7 @@ class LeadWindow(QMainWindow and QWidget):
     def Thirdwindow(self):
         self.resize(350, 480)
         self.center()
-        self.setWindowTitle('Leaderboard')
-
-        palette = QPalette()
-        palette.setColor(QPalette.Background, QColor("#92B6D5"))
-        self.setPalette(palette)
+        self.setWindowTitle('Results')
 
         file = QPushButton('Write Lead.', self)
         file.resize(file.sizeHint())
