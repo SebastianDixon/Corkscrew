@@ -28,12 +28,12 @@ class Window(QWidget and  QMainWindow):
         self.setWindowTitle('Corkscrew')
 
         qbtn = QPushButton('Exit', self)
-        qbtn.setGeometry(180,190, 50,30) #geometry(x,y, width,height)
+        qbtn.setGeometry(165,190, 50,30) #geometry(x,y, width,height)
         qbtn.clicked.connect(self.exit_app)
 
         runbtn = QPushButton('RUNRUNRUNRUNRUNRUNRUN', self)
         runbtn.setGeometry(20,20, 210,30)
-#       runbtn.clicked.connect(self.gpu_dropDown)
+        runbtn.clicked.connect(self.gpu_dropDown)
         runbtn.clicked.connect(self.open_heaven)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
@@ -111,7 +111,7 @@ class Window(QWidget and  QMainWindow):
 # cpu
 
     def cpu_util_timer(self):
-        for n in range(10):
+        for n in range(60):
             Graph.cpu_y.append(psutil.cpu_percent())
             Graph.time_x.append(n)
             time.sleep(1)
@@ -128,6 +128,11 @@ class Window(QWidget and  QMainWindow):
         rounded_mean = round(mean, 3)
         print('Average CPU utilisation =', rounded_mean,'%')
 
+    def cpuName(self):
+        text, okPressed = QInputDialog.getText(self, "Get text", "Your name:", QLineEdit.Normal, "")
+        if okPressed and text != '':
+            print(text)
+
 # gpu
 
     def gpu_dropDown(self):
@@ -135,10 +140,13 @@ class Window(QWidget and  QMainWindow):
         item, okPressed = QInputDialog.getItem(self, "Get item", "GPU:", items, 0, False)
         if okPressed and item:
             print(item)
-            if item == ('Nvidia'):
-                self.N_gpu_util_timer()
-            else:
-                self.A_gpu_util_timer()
+            try:
+                if item == ('Nvidia'):
+                    self.N_gpu_util_timer()
+                else:
+                    self.A_gpu_util_timer()
+            except:
+                print('No GPU')
 
     def N_gpu_util_timer(self):
         for n in range(10):
@@ -170,7 +178,7 @@ class Window(QWidget and  QMainWindow):
 
     def ram_util_timer(self):
         mem = virtual_memory()
-        for x in range(10):
+        for x in range(60):
             Graph.ram_y.append(mem.percent)
             time.sleep(1)
         print(Graph.ram_y)
