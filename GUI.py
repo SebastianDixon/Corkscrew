@@ -16,7 +16,9 @@ from bs4 import BeautifulSoup
 
 # ------------------ First Window -------------------
 
-class Window(QWidget and  QMainWindow):
+bottle = ""
+
+class Window(QWidget and QMainWindow):
 
     def __init__(self):
         super().__init__()
@@ -58,7 +60,7 @@ class Window(QWidget and  QMainWindow):
 
 # Leaderboard Buttons
 
-        leadBtn = QPushButton('Database', self)
+        leadBtn = QPushButton('Results', self)
         leadBtn.resize(leadBtn.sizeHint())
         leadBtn.move(150, 90)
         leadBtn.clicked.connect(self.create_leader_window)
@@ -68,6 +70,7 @@ class Window(QWidget and  QMainWindow):
 # bottleneck
 
     def util_difference(self):
+        global bottle
         c_length = len(Graph.cpu_y)
         g_length = len(Graph.gpu_y)
         cpu_total = 0
@@ -83,9 +86,11 @@ class Window(QWidget and  QMainWindow):
         Database.openFile(self)
         print('')
         if cpu_average > gpu_average:
+            bottle = 'CPU'
             print('bottleneck = cpu')
             Database.gpu_search_database()
         else:
+            bottle = 'GPU'
             print('bottleneck = gpu')
             Database.cpu_search_database()
 
@@ -129,6 +134,7 @@ class Window(QWidget and  QMainWindow):
         print('Average CPU utilisation =', rounded_mean,'%')
 
     def cpuName(self):
+
         text, okPressed = QInputDialog.getText(self, "Get text", "Your name:", QLineEdit.Normal, "")
         if okPressed and text != '':
             print(text)
@@ -328,21 +334,13 @@ class LeadWindow(QMainWindow and QWidget):
         self.center()
         self.setWindowTitle('Results')
 
-        file = QPushButton('Write Lead.', self)
-        file.resize(file.sizeHint())
-        file.move(100, 100)
-        file.clicked.connect(self.openFile2)
-        file.clicked.connect(self.input_database2)
-
-        file3 = QPushButton('CPU search.', self)
-        file3.resize(file3.sizeHint())
-        file3.move(100, 200)
-        file3.clicked.connect(self.cpu_search_database2)
-
-        file4 = QPushButton('GPU search.', self)
-        file4.resize(file4.sizeHint())
-        file4.move(200, 200)
-        file4.clicked.connect(self.gpu_search_database2)
+        self.cpubtn = QPushButton('CPUs', self)
+        self.cpubtn.sizeHint()
+        self.cpubtn.move(0, 0)
+        self.cpubtn.clicked.connect()
+        self.cpu_rec = QTextEdit(self)
+        self.cpu_rec.move(120, 0)
+        self.cpu_rec.setPlaceholderText('recommended CPU')
 
         self.show()
 
@@ -353,18 +351,6 @@ class LeadWindow(QMainWindow and QWidget):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-
-    def openFile2(self):
-        return Database.openFile(self)
-
-    def input_database2(self):
-        return Database.write_database()
-
-    def cpu_search_database2(self):
-        return Database.cpu_search_database()
-
-    def gpu_search_database2(self):
-        return Database.gpu_search_database()
 
 
 if __name__ == '__main__':
