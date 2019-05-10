@@ -10,13 +10,12 @@ import GPUtil
 from psutil import virtual_memory
 import sys
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
 import time
-from bs4 import BeautifulSoup
 
 # ------------------ First Window -------------------
 
 bottle = ""
+
 
 class Window(QWidget and QMainWindow):
 
@@ -29,13 +28,12 @@ class Window(QWidget and QMainWindow):
         self.center()
         self.setWindowTitle('Corkscrew')
 
-        qbtn = QPushButton('Exit', self)
+        qbtn = QPushButton('GTFO', self)
         qbtn.setGeometry(165,190, 50,30) #geometry(x,y, width,height)
         qbtn.clicked.connect(self.exit_app)
 
-        runbtn = QPushButton('RUNRUNRUNRUNRUNRUNRUN', self)
+        runbtn = QPushButton('RUN Forrest RUN', self)
         runbtn.setGeometry(20,20, 210,30)
-        runbtn.clicked.connect(self.gpu_dropDown)
         runbtn.clicked.connect(self.open_heaven)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
@@ -105,23 +103,16 @@ class Window(QWidget and QMainWindow):
         if answer == QMessageBox.Yes:
             sys.exit()
         else:
-            print('Application Not Closed')
-
-    def openFile2(self):
-        return Database.openFile(self)
-
-    def input_database2(self):
-        return Database.write_database()
+            print('Application Resumed')
 
 # cpu
 
     def cpu_util_timer(self):
-        for n in range(60):
+        for n in range(10):
             Graph.cpu_y.append(psutil.cpu_percent())
             Graph.time_x.append(n)
             time.sleep(1)
         print(Graph.cpu_y)
-        print(Graph.time_x)
         print('cpu done')
 
     def cpu_util_mean(self):
@@ -133,43 +124,21 @@ class Window(QWidget and QMainWindow):
         rounded_mean = round(mean, 3)
         print('Average CPU utilisation =', rounded_mean,'%')
 
-    def cpuName(self):
-
-        text, okPressed = QInputDialog.getText(self, "Get text", "Your name:", QLineEdit.Normal, "")
-        if okPressed and text != '':
-            print(text)
-
 # gpu
 
-    def gpu_dropDown(self):
-        items = ('Nvidia', 'AMD')
-        item, okPressed = QInputDialog.getItem(self, "Get item", "GPU:", items, 0, False)
-        if okPressed and item:
-            print(item)
+    def gpu_util_timer(self):
+        for n in range(10):
             try:
-                if item == ('Nvidia'):
-                    self.N_gpu_util_timer()
-                else:
-                    self.A_gpu_util_timer()
+                GPUs = GPUtil.getGPUs()
+                gpu_load = GPUs[0].load
+                Graph.gpu_y.append(gpu_load)
             except:
-                print('No GPU')
-
-    def N_gpu_util_timer(self):
-        for n in range(10):
-            GPUs = GPUtil.getGPUs()
-            gpu_load = GPUs[0].load
-            Graph.gpu_y.append(gpu_load)
+                Graph.gpu_y.append(pyadl.ADLDevice.getCurrentUsage())
+                Graph.time_x.append(n)
             time.sleep(1)
-        print(Graph.gpu_y)
-        print('N gpu done')
 
-    def A_gpu_util_timer(self):
-        for n in range(10):
-            Graph.gpu_y.append(pyadl.ADLDevice.getCurrentUsage())
-            Graph.time_x.append(n)
-            time.sleep(1)
         print(Graph.gpu_y)
-        print('A gpu done')
+        print('gpu done')
 
     def gpu_util_mean(self):
         length = len(Graph.gpu_y)
@@ -184,11 +153,10 @@ class Window(QWidget and QMainWindow):
 
     def ram_util_timer(self):
         mem = virtual_memory()
-        for x in range(60):
+        for x in range(10):
             Graph.ram_y.append(mem.percent)
             time.sleep(1)
         print(Graph.ram_y)
-        print(Graph.time_x)
         print('ram done')
 
     def ram_util_mean(self):
@@ -235,7 +203,7 @@ class Window(QWidget and QMainWindow):
         self.next = PcWindow()
 
     def create_leader_window(self):
-        self.next = LeadWindow()
+        self.next = ResWindow()
 
 
 class PcWindow(QMainWindow):
@@ -245,10 +213,10 @@ class PcWindow(QMainWindow):
         self.Secondwindow()
 
     def Secondwindow(self):
-        self.resize(240, 450)
+        self.resize(250, 250)
         self.center()
 
-#cpu
+# cpu
         self.cpu1btn = QPushButton('CPU Type', self)
         self.cpu1btn.sizeHint()
         self.cpu1btn.move(0,0)
@@ -257,30 +225,23 @@ class PcWindow(QMainWindow):
         self.cpu_box.move(120,0)
         self.cpu_box.setPlaceholderText('CPU')
 
-#gpu
-        self.gpu1btn = QPushButton('AMD GPU', self)
+# gpu
+        self.gpu1btn = QPushButton('GPU', self)
         self.gpu1btn.sizeHint()
-        self.gpu1btn.move(0, 120)
-        self.gpu1btn.clicked.connect(self.A_gpu_name)
+        self.gpu1btn.move(0, 75)
+        self.gpu1btn.clicked.connect(self.gpu_name)
         self.gpu_box = QTextEdit(self)
         self.gpu_box.setPlaceholderText('GPU')
-        self.gpu_box.move(120, 120)
+        self.gpu_box.move(120, 75)
 
-        self.gpu2btn = QPushButton('NVIDIA GPU', self)
-        self.gpu2btn.sizeHint()
-        self.gpu2btn.move(0, 240)
-        self.gpu2btn.clicked.connect(self.N_gpu_name)
-        self.gpu2_box = QTextEdit(self)
-        self.gpu2_box.setPlaceholderText('GPU')
-        self.gpu2_box.move(120, 240)
+# ram
 
-#ram
         self.rambtn = QPushButton('RAM', self)
         self.rambtn.sizeHint()
-        self.rambtn.move(0, 360)
+        self.rambtn.move(0, 150)
         self.rambtn.clicked.connect(self.ram_find)
         self.ram_box = QTextEdit(self)
-        self.ram_box.move(120, 360)
+        self.ram_box.move(120, 150)
         self.ram_box.setPlaceholderText('RAM')
 
         self.show()
@@ -293,19 +254,16 @@ class PcWindow(QMainWindow):
         model = after[2].split('-')[1]
         self.cpu_box.insertPlainText(model)
 
-    def A_gpu_name(self):
+    def gpu_name(self):
         try:
-            output = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
-            self.gpu_box.insertPlainText(output)
+            try:
+                output = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
+                self.gpu_box.insertPlainText(output)
+            except:
+                output2 = GPUtil.GPU.name
+                self.gpu_box.insertPlainText(output2)
         except:
-            self.gpu_box.insertPlainText('amd gpu')
-
-    def N_gpu_name(self):
-        try:
-            output = GPUtil.GPU.name
-            self.gpu2_box.insertPlainText(output)
-        except:
-            self.gpu2_box.insertPlainText('nvidia gpu')
+            self.gpu_box.insertPlainText('no gpu found')
 
     def ram_find(self):
         mem = virtual_memory()
@@ -323,7 +281,7 @@ class PcWindow(QMainWindow):
         self.move(qr.topLeft())
 
 
-class LeadWindow(QMainWindow and QWidget):
+class ResWindow(QMainWindow and QWidget):
 
     def __init__(self):
         super().__init__()
@@ -334,13 +292,25 @@ class LeadWindow(QMainWindow and QWidget):
         self.center()
         self.setWindowTitle('Results')
 
+# cpu
+
         self.cpubtn = QPushButton('CPUs', self)
         self.cpubtn.sizeHint()
         self.cpubtn.move(0, 0)
         self.cpubtn.clicked.connect()
         self.cpu_rec = QTextEdit(self)
         self.cpu_rec.move(120, 0)
-        self.cpu_rec.setPlaceholderText('recommended CPU')
+        self.cpu_rec.setPlaceholderText('recommended CPU(s)')
+
+# gpu
+
+        self.gpubtn = QPushButton('GPUs', self)
+        self.gpubtn.sizeHint()
+        self.gpubtn.move(0, 0)
+        self.gpubtn.clicked.connect()
+        self.gpu_rec = QTextEdit(self)
+        self.gpu_rec.move(120, 0)
+        self.gpu_rec.setPlaceholderText('recommended GPU(s)')
 
         self.show()
 

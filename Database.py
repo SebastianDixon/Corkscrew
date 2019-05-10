@@ -108,13 +108,15 @@ def gpu_search_database():
 def URL():
     part1 = 'https://www.amazon.co.uk/s?k='
     part2 = '&ref=nb_sb_noss_2'
-    if GPU.bottle == 'CPU':
+    if GUI.bottle == 'CPU':
         for i in range(0, len(recommend_gpu)):
             split1 = recommend_gpu[i].split(' ')
             joined = split1[0] + split1[1]
             url = part1 + joined + part2
             print(url)
-    else:
+    elif GUI.bottle == 'GPU':
         for i in range(0, len(recommend_cpu)):
             url = part1 + recommend_cpu[i] + part2
             print(url)
+    else:
+        print('no work')
