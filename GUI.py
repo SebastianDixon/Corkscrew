@@ -184,15 +184,6 @@ class Window(QWidget and QMainWindow):
     def output_util_graphs(self):
         return Graph.util_graphs
 
-    def openFile2(self):
-        return Database.openFile(self)
-
-    def input_database2(self):
-        return Database.write_database()
-
-    def read_database2(self):
-        return Database.read_database_prompt()
-
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()

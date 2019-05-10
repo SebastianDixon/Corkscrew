@@ -84,7 +84,7 @@ def cpu_search_database():
             for row in cursor:
                 recommend_gpu.append(row['GPU'])
                 print(row['GPU'])
-            URL()
+            gpu_URL()
         connection.commit()
 
     finally:
@@ -99,24 +99,24 @@ def gpu_search_database():
             for row in cursor:
                 recommend_cpu.append(row['CPU'])
                 print(row['CPU'])
-            URL()
+            cpu_URL()
         connection.commit()
 
     finally:
         connection.close()
 
-def URL():
+def cpu_URL():
     part1 = 'https://www.amazon.co.uk/s?k='
     part2 = '&ref=nb_sb_noss_2'
-    if GUI.bottle == 'CPU':
-        for i in range(0, len(recommend_gpu)):
-            split1 = recommend_gpu[i].split(' ')
-            joined = split1[0] + split1[1]
-            url = part1 + joined + part2
-            print(url)
-    elif GUI.bottle == 'GPU':
-        for i in range(0, len(recommend_cpu)):
-            url = part1 + recommend_cpu[i] + part2
-            print(url)
-    else:
-        print('no work')
+    for i in range(0, len(recommend_cpu)):
+        url = part1 + recommend_cpu[i] + part2
+        print(url)
+
+def gpu_URL():
+    part1 = 'https://www.amazon.co.uk/s?k='
+    part2 = '&ref=nb_sb_noss_2'
+    for i in range(0, len(recommend_gpu)):
+        split1 = recommend_gpu[i].split(' ')
+        joined = split1[0] + split1[1]
+        url = part1 + joined + part2
+        print(url)
