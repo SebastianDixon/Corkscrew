@@ -13,6 +13,7 @@ results = []
 recommend_cpu = []
 recommend_gpu = []
 
+
 def openFile(self):
     options = QFileDialog.Options()
 
@@ -90,6 +91,7 @@ def cpu_search_database():
     finally:
         connection.close()
 
+
 def gpu_search_database():
     gpu = input('GPU name: ')
     try:
@@ -105,12 +107,14 @@ def gpu_search_database():
     finally:
         connection.close()
 
+
 def cpu_URL():
     part1 = 'https://www.amazon.co.uk/s?k='
     part2 = '&ref=nb_sb_noss_2'
     for i in range(0, len(recommend_cpu)):
         url = part1 + recommend_cpu[i] + part2
         print(url)
+
 
 def gpu_URL():
     part1 = 'https://www.amazon.co.uk/s?k='

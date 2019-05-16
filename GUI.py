@@ -10,9 +10,8 @@ import GPUtil
 from psutil import virtual_memory
 import sys
 from PyQt5.QtWidgets import *
+from PyQt5.Qt import QApplication
 import time
-
-# ------------------ First Window -------------------
 
 bottle = ""
 
@@ -25,15 +24,13 @@ class Window(QWidget and QMainWindow):
 
     def window(self):
         self.resize(250, 250)
-        self.center()
         self.setWindowTitle('Corkscrew')
 
-        qbtn = QPushButton('GTFO', self)
-        qbtn.setGeometry(165,190, 50,30) #geometry(x,y, width,height)
-        qbtn.clicked.connect(self.exit_app)
+# run
 
-        runbtn = QPushButton('RUN Forrest RUN', self)
+        runbtn = QPushButton('RUN, START, GO, BEGIN', self)
         runbtn.setGeometry(20,20, 210,30)
+
         runbtn.clicked.connect(self.open_heaven)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
@@ -51,7 +48,7 @@ class Window(QWidget and QMainWindow):
 
 # PC Buttons
 
-        pcbtn = QPushButton('Pc Parts', self)
+        pcbtn = QPushButton('My PC', self)
         pcbtn.resize(pcbtn.sizeHint())
         pcbtn.move(20, 90)
         pcbtn.clicked.connect(self.create_window)
@@ -63,9 +60,16 @@ class Window(QWidget and QMainWindow):
         leadBtn.move(150, 90)
         leadBtn.clicked.connect(self.create_leader_window)
 
+# Help Button
+
+        helpBtn = QPushButton('Help', self)
+        helpBtn.resize(leadBtn.sizeHint())
+        helpBtn.move(150, 150)
+        helpBtn.clicked.connect(self.create_help_window)
+
         self.show()
 
-# bottleneck
+# bottleneck calculator
 
     def util_difference(self):
         global bottle
@@ -95,15 +99,6 @@ class Window(QWidget and QMainWindow):
         self.result_box = QTextEdit(self)
         self.result_box.move(120, 0)
         self.result_box.setPlaceholderText('CPU')
-
-# misc
-
-    def exit_app(self):
-        answer = QMessageBox.question(self, 'Exit', 'Are you sure?', QMessageBox.Yes | QMessageBox.No)
-        if answer == QMessageBox.Yes:
-            sys.exit()
-        else:
-            print('Application Resumed')
 
 # cpu
 
@@ -184,17 +179,35 @@ class Window(QWidget and QMainWindow):
     def output_util_graphs(self):
         return Graph.util_graphs
 
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-
     def create_window(self):
         self.next = PcWindow()
 
     def create_leader_window(self):
         self.next = ResWindow()
+
+    def create_help_window(self):
+        self.next = HelpWindow()
+
+
+class HelpWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.FourthWindow()
+
+    def FourthWindow(self):
+        self.resize(250, 250)
+        self.move(500,0)
+
+        self.b = QPlainTextEdit(self)
+        self.b.insertPlainText('1. Use Recommended Benchmark settings\n 2. Save Run Benchmark\n 3. Press F12 to Start\n '
+                               '4. Save Results file when finished\n 5. Open Results file when prompted\n '
+                               '6. Input CPU if prompted\n 7. Receive Recommended parts\n\n '
+                               'Settings for Benchmark:\n API - DirectX11\n Quality - Ultra Tesselation\n '
+                               'Extreme Resolution - 1920x1080')
+        self.b.move(0, 0)
+        self.b.resize(250, 250)
+
+        self.show()
 
 
 class PcWindow(QMainWindow):
@@ -205,7 +218,7 @@ class PcWindow(QMainWindow):
 
     def Secondwindow(self):
         self.resize(250, 250)
-        self.center()
+        self.move(0,0)
 
 # cpu
         self.cpu1btn = QPushButton('CPU Type', self)
@@ -265,12 +278,6 @@ class PcWindow(QMainWindow):
         self.ram_box.insertPlainText(output)
         self.ram_box.insertPlainText(units)
 
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-
 
 class ResWindow(QMainWindow and QWidget):
 
@@ -279,39 +286,31 @@ class ResWindow(QMainWindow and QWidget):
         self.Thirdwindow()
 
     def Thirdwindow(self):
-        self.resize(350, 480)
-        self.center()
+        self.resize(250, 450)
         self.setWindowTitle('Results')
+        self.move(250,0)
 
 # cpu
 
         self.cpubtn = QPushButton('CPUs', self)
         self.cpubtn.sizeHint()
         self.cpubtn.move(0, 0)
-        self.cpubtn.clicked.connect()
+#        self.cpubtn.clicked.connect()
         self.cpu_rec = QTextEdit(self)
-        self.cpu_rec.move(120, 0)
+        self.cpu_rec.move(0, 30)
         self.cpu_rec.setPlaceholderText('recommended CPU(s)')
 
 # gpu
 
         self.gpubtn = QPushButton('GPUs', self)
         self.gpubtn.sizeHint()
-        self.gpubtn.move(0, 0)
-        self.gpubtn.clicked.connect()
+        self.gpubtn.move(0, 230)
+#        self.gpubtn.clicked.connect()
         self.gpu_rec = QTextEdit(self)
-        self.gpu_rec.move(120, 0)
+        self.gpu_rec.move(0, 260)
         self.gpu_rec.setPlaceholderText('recommended GPU(s)')
 
         self.show()
-
-# functions
-
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
 
 
 if __name__ == '__main__':
