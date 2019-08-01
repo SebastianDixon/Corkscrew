@@ -1,7 +1,7 @@
 import Graph
 import Database
 
-# import pyadl
+import pyadl
 import cpuinfo
 import os
 import psutil

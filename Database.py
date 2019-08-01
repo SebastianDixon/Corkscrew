@@ -3,10 +3,10 @@ from PyQt5.QtWidgets import *
 from bs4 import BeautifulSoup
 import GUI
 
-connection = pymysql.connect(host='localhost',
-                             user='root',
-                             password='password',
-                             db='Database',
+connection = pymysql.connect(host='sql2.freemysqlhosting.net',
+                             user='sql2300540',
+                             password='wZ6!dU7!',
+                             db='sql2300540',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 results = []
@@ -33,17 +33,17 @@ def openFile(self):
 def name_check():
     model = GUI.cpu_name.model()
     with connection.cursor() as cursor:
-        sql = "SELECT COUNT(*) FROM `Leaderboard`"
+        sql = "SELECT COUNT(*) FROM `leaderboardtable`"
         cursor.execute(sql, )
         index = cursor.fetchone()
 
     if GUI.bottle == 'CPU':
         for i in range(index[0]):
-            sql = "SELECT ALL FROM `Leaderboard` WHERE 'CPU' = {}".format(index)
+            sql = "SELECT ALL FROM `leaderboardtable` WHERE 'CPU' = {}".format(index)
             if sql == model:
                 try:
                     with connection.cursor() as cursor:
-                        sql = "SELECT `GPU` FROM `Leaderboard` WHERE `CPU`= %s"
+                        sql = "SELECT `GPU` FROM `leaderboardtable` WHERE `CPU`= %s"
                         cursor.execute(sql, (model,))
                         for row in cursor:
                             recommend_gpu.append(row['GPU'])
@@ -58,11 +58,11 @@ def name_check():
 
     else:
         for i in range(index[0]):
-            sql = "SELECT ALL FROM `Leaderboard` WHERE 'GPU' = {}".format(index)
+            sql = "SELECT ALL FROM `leaderboardtable` WHERE 'GPU' = {}".format(index)
             if sql == model:
                 try:
                     with connection.cursor() as cursor:
-                        sql = "SELECT `CPU` FROM `Leaderboard` WHERE `GPU`= %s"
+                        sql = "SELECT `CPU` FROM `leaderboardtable` WHERE `GPU`= %s"
                         cursor.execute(sql, (model,))
                         for row in cursor:
                             recommend_gpu.append(row['CPU'])
@@ -80,7 +80,7 @@ def cpu_search_database():
     cpu = input('CPU name: ')
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT `GPU` FROM `Leaderboard` WHERE `CPU`= %s"
+            sql = "SELECT `GPU` FROM `leaderboardtable` WHERE `CPU`= %s"
             cursor.execute(sql, (cpu,))
             for row in cursor:
                 recommend_gpu.append(row['GPU'])
@@ -96,7 +96,7 @@ def gpu_search_database():
     gpu = input('GPU name: ')
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT `CPU` FROM `Leaderboard` WHERE `GPU`= %s"
+            sql = "SELECT `CPU` FROM `leaderboardtable` WHERE `GPU`= %s"
             cursor.execute(sql, (gpu,))
             for row in cursor:
                 recommend_cpu.append(row['CPU'])
