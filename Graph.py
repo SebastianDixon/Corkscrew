@@ -1,9 +1,8 @@
 import pyqtgraph as pg
-import pyqtgraph.exporters
-import numpy as np
+
 
 cpu_y = []
-gpu_y = [44,85,96,97,58,89,90,60,92,63]
+gpu_y = []
 ram_y = []
 time_x = []
 
