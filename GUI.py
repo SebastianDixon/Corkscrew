@@ -1,7 +1,7 @@
 import Graph
 import Database
 
-import pyadl
+#import pyadl
 import cpuinfo
 import os
 import psutil
@@ -29,7 +29,7 @@ class Window(QWidget and QMainWindow):
 # run
 
         runbtn = QPushButton('RUN, START, GO, BEGIN', self)
-        runbtn.setGeometry(20,20, 210,30)
+        runbtn.setGeometry(20, 20, 210, 30)
 
         runbtn.clicked.connect(self.open_heaven)
         runbtn.clicked.connect(self.cpu_util_timer)
@@ -196,13 +196,14 @@ class HelpWindow(QMainWindow):
 
     def FourthWindow(self):
         self.resize(250, 250)
-        self.move(500,0)
+        self.move(500, 0)
 
         self.b = QPlainTextEdit(self)
-        self.b.insertPlainText('1. Use Recommended Benchmark settings\n 2. Save Run Benchmark\n 3. Press F12 to Start\n '
-                               '4. Save Results file when finished\n 5. Open Results file when prompted\n '
-                               '6. Input CPU if prompted\n 7. Receive Recommended parts\n\n '
-                               'Settings for Benchmark:\n API - DirectX11\n Quality - Ultra Tesselation\n '
+        self.b.insertPlainText('1. Use Recommended Benchmark settings\n2. Save Run Benchmark\n'
+                               '3. Press F12 to Start\n'
+                               '4. Save Results file when finished\n5. Open Results file when prompted\n'
+                               '6. Input CPU if prompted\n7. Receive Recommended parts\n\n'
+                               'Settings for Benchmark:\nAPI - DirectX11\nQuality - Ultra Tesselation\n'
                                'Extreme Resolution - 1920x1080')
         self.b.move(0, 0)
         self.b.resize(250, 250)
@@ -261,11 +262,11 @@ class PcWindow(QMainWindow):
     def gpu_name(self):
         try:
             try:
-                output = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
-                self.gpu_box.insertPlainText(output)
+                model = GPUtil.GPU.name
+                self.gpu_box.insertPlainText(model)
             except:
-                output2 = GPUtil.GPU.name
-                self.gpu_box.insertPlainText(output2)
+                model = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
+                self.gpu_box.insertPlainText(model)
         except:
             self.gpu_box.insertPlainText('no gpu found')
 
