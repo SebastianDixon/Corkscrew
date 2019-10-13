@@ -3,12 +3,14 @@ from PyQt5.QtWidgets import *
 from bs4 import BeautifulSoup
 import GUI
 
-connection = pymysql.connect(host='sql2.freemysqlhosting.net',
-                             user='sql2300540',
-                             password='wZ6!dU7!',
-                             db='sql2300540',
+connection = pymysql.connect(host='localhost',
+                             user='root',
+                             password='password',
+                             db='Hardware',
                              charset='utf8mb4',
+                             autocommit=True,
                              cursorclass=pymysql.cursors.DictCursor)
+
 results = []
 recommend_cpu = []
 recommend_gpu = []
@@ -27,84 +29,63 @@ def openFile(self):
         for item in soup.find_all('strong'):
             results.append(float(item.text))
     print('Score =', results[1])
-    print('Fps =', results[0])
+    print('Fps =', results)
 
 
-def name_check():
-    model = GUI.cpu_name.model()
-    with connection.cursor() as cursor:
-        sql = "SELECT COUNT(*) FROM `leaderboardtable`"
-        cursor.execute(sql, )
-        index = cursor.fetchone()
-
-    if GUI.bottle == 'CPU':
-        for i in range(index[0]):
-            sql = "SELECT ALL FROM `leaderboardtable` WHERE 'CPU' = {}".format(index)
-            if sql == model:
-                try:
-                    with connection.cursor() as cursor:
-                        sql = "SELECT `GPU` FROM `leaderboardtable` WHERE `CPU`= %s"
-                        cursor.execute(sql, (model,))
-                        for row in cursor:
-                            recommend_gpu.append(row['GPU'])
-                            print(row['GPU'])
-                        gpu_URL()
-                    connection.commit()
-
-                finally:
-                    connection.close()
-            else:
-                print('cpu not found')
-
+def test_item():
+    if GUI.bottle == 'cpu':
+        choice = int(input('Test? (1/0)'))
+        if choice == 1:
+            itemName = input('GPU name: ')
+        else:
+            itemName = GUI.gpu_name().model
     else:
-        for i in range(index[0]):
-            sql = "SELECT ALL FROM `leaderboardtable` WHERE 'GPU' = {}".format(index)
-            if sql == model:
-                try:
-                    with connection.cursor() as cursor:
-                        sql = "SELECT `CPU` FROM `leaderboardtable` WHERE `GPU`= %s"
-                        cursor.execute(sql, (model,))
-                        for row in cursor:
-                            recommend_gpu.append(row['CPU'])
-                            print(row['CPU'])
-                        cpu_URL()
-                    connection.commit()
+        choice = int(input('Test? (1/0)'))
+        if choice == 1:
+            itemName = input('CPU name: ')
+        else:
+            itemName = GUI.cpu_name().model
+    print(itemName)
 
-                finally:
-                    connection.close()
-            else:
-                print('gpu not found')
+"""
+def cpu_search_database():
+    itemName = input('CPU name: ')
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT 'GPU' FROM 'Parts' WHERE 'CPU' = %s"
+            cursor.execute(sql, (itemName, ))
+            result = cursor.fetchone()
+            print(result)
+    finally:
+        connection.close()
+"""
 
 
 def cpu_search_database():
     cpu = input('CPU name: ')
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT `GPU` FROM `leaderboardtable` WHERE `CPU`= %s"
+            sql = "SELECT `GPU` FROM `Hardware`.`Parts` WHERE `CPU`= %s"
             cursor.execute(sql, (cpu,))
             for row in cursor:
                 recommend_gpu.append(row['GPU'])
                 print(row['GPU'])
             gpu_URL()
-        connection.commit()
-
     finally:
         connection.close()
 
 
 def gpu_search_database():
-    gpu = input('GPU name: ')
-    try:
+     gpu = input('GPU name: ')
+     try:
         with connection.cursor() as cursor:
-            sql = "SELECT `CPU` FROM `leaderboardtable` WHERE `GPU`= %s"
+            sql = "SELECT `CPU` FROM `Hardware`.`Parts` WHERE `GPU`= %s"
             cursor.execute(sql, (gpu,))
             for row in cursor:
                 recommend_cpu.append(row['CPU'])
                 print(row['CPU'])
             cpu_URL()
-        connection.commit()
-
-    finally:
+     finally:
         connection.close()
 
 
@@ -114,7 +95,6 @@ def cpu_URL():
     for i in range(0, len(recommend_cpu)):
         url = part1 + recommend_cpu[i] + part2
         print(url)
-
 
 def gpu_URL():
     part1 = 'https://www.amazon.co.uk/s?k='

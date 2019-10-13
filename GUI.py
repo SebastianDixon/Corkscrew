@@ -1,13 +1,12 @@
 import Graph
 import Database
 
-import pyadl
+#import pyadl
 import cpuinfo
 import os
 import psutil
 import subprocess
 import GPUtil
-import nvgpu
 from psutil import virtual_memory
 import sys
 from PyQt5.QtWidgets import *
@@ -15,6 +14,7 @@ from PyQt5.Qt import QApplication
 import time
 
 bottle = ""
+
 
 class Window(QWidget and QMainWindow):
 
@@ -29,12 +29,11 @@ class Window(QWidget and QMainWindow):
 # run
 
         runbtn = QPushButton('RUN, START, GO, BEGIN', self)
-        runbtn.setGeometry(20,20, 210,30)
+        runbtn.setGeometry(20, 20, 210, 30)
 
         runbtn.clicked.connect(self.open_heaven)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
-        runbtn.clicked.connect(self.gpu_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
         runbtn.clicked.connect(self.gpu_util_mean)
@@ -104,7 +103,7 @@ class Window(QWidget and QMainWindow):
 # cpu
 
     def cpu_util_timer(self):
-        for n in range(60):
+        for n in range(10):
             Graph.cpu_y.append(psutil.cpu_percent())
             Graph.time_x.append(n)
             time.sleep(1)
@@ -123,12 +122,11 @@ class Window(QWidget and QMainWindow):
 # gpu
 
     def gpu_util_timer(self):
-        for n in range(60):
+        for n in range(10):
             try:
                 GPUs = GPUtil.getGPUs()
                 gpu_load = GPUs[0].load
-                PercentGpu = gpu_load*100
-                Graph.gpu_y.append(PercentGpu)
+                Graph.gpu_y.append(gpu_load)
             except:
                 Graph.gpu_y.append(pyadl.ADLDevice.getCurrentUsage())
                 Graph.time_x.append(n)
@@ -150,7 +148,7 @@ class Window(QWidget and QMainWindow):
 
     def ram_util_timer(self):
         mem = virtual_memory()
-        for x in range(5):
+        for x in range(10):
             Graph.ram_y.append(mem.percent)
             time.sleep(1)
         print(Graph.ram_y)
@@ -198,14 +196,15 @@ class HelpWindow(QMainWindow):
 
     def FourthWindow(self):
         self.resize(250, 250)
-        self.move(500,0)
+        self.move(500, 0)
 
         self.b = QPlainTextEdit(self)
-        self.b.insertPlainText('1. Use Recommended Benchmark settings\n 2. Save Run Benchmark\n 3. Press F12 to Start\n '
-                               '4. Save Results file when finished\n 5. Open Results file when prompted\n '
-                               '6. Input CPU if prompted\n 7. Receive Recommended parts\n\n '
-                               'Settings for Benchmark:\n API - DirectX11\n Quality - Ultra\n Tesselation - Extreme\n'
-                               ' Resolution - 1920x1080')
+        self.b.insertPlainText('1. Use Recommended Benchmark settings\n2. Save Run Benchmark\n'
+                               '3. Press F12 to Start\n'
+                               '4. Save Results file when finished\n5. Open Results file when prompted\n'
+                               '6. Input CPU if prompted\n7. Receive Recommended parts\n\n'
+                               'Settings for Benchmark:\nAPI - DirectX11\nQuality - Ultra Tesselation\n'
+                               'Extreme Resolution - 1920x1080')
         self.b.move(0, 0)
         self.b.resize(250, 250)
 
@@ -263,11 +262,11 @@ class PcWindow(QMainWindow):
     def gpu_name(self):
         try:
             try:
-                output = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
-                self.gpu_box.insertPlainText(output)
+                model = GPUtil.GPU.name
+                self.gpu_box.insertPlainText(model)
             except:
-                output2 = GPUtil.getAvailability()
-                self.gpu_box.insertPlainText(output2)
+                model = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
+                self.gpu_box.insertPlainText(model)
         except:
             self.gpu_box.insertPlainText('no gpu found')
 
