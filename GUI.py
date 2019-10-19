@@ -258,6 +258,7 @@ class PcWindow(QMainWindow):
         after = before.split(' ')
         model = after[2].split('-')[1]
         self.cpu_box.insertPlainText(model)
+        return model
 
     def gpu_name(self):
         try:
