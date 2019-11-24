@@ -76,7 +76,3 @@ def gpu_URL():
         joined = split1[0] + split1[1]
         url = part1 + joined + part2
         print(url)
-
-def URL():
-    part1 = 'https://www.amazon.co.uk/s?k='
-    part2 = '&ref=nb_sb_noss_2'
