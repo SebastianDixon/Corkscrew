@@ -1,7 +1,6 @@
 import Graph
 import Database
-
-#import pyadl
+import pyadl
 import cpuinfo
 import os
 import psutil
@@ -34,6 +33,7 @@ class Window(QWidget and QMainWindow):
         runbtn.clicked.connect(self.open_heaven)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
+        runbtn.clicked.connect(self.gpu_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
         runbtn.clicked.connect(self.gpu_util_mean)
@@ -84,84 +84,88 @@ class Window(QWidget and QMainWindow):
             gpu_total += Graph.gpu_y[x]
         cpu_average = cpu_total / len(Graph.cpu_y)
         gpu_average = gpu_total / len(Graph.gpu_y)
-        print('')
+
         Database.openFile(self)
-        print('')
+
         if cpu_average > gpu_average:
             bottle = 'CPU'
-            print('bottleneck = cpu')
-            Database.gpu_search_database()
         else:
             bottle = 'GPU'
-            print('bottleneck = gpu')
-            Database.cpu_search_database()
+
+        self.notif()
 
         self.result_box = QTextEdit(self)
         self.result_box.move(120, 0)
         self.result_box.setPlaceholderText('CPU')
 
+    def notif(self):
+        if bottle == 'CPU':
+            QMessageBox.about(self, "Notice", "Bottleneck = CPU")
+            Database.gpu_search_database(self)
+        else:
+            QMessageBox.about(self, "Notice", "Bottleneck = GPU")
+            Database.cpu_search_database(self)
+        self.show()
+
 # cpu
 
     def cpu_util_timer(self):
-        for n in range(10):
+        for n in range(5):
             Graph.cpu_y.append(psutil.cpu_percent())
             Graph.time_x.append(n)
             time.sleep(1)
         print(Graph.cpu_y)
-        print('cpu done')
 
     def cpu_util_mean(self):
         length = len(Graph.cpu_y)
         product = 0
         for x in range(length):
-            product = product + Graph.cpu_y[x]
+            product += Graph.cpu_y[x]
         mean = product / length
         rounded_mean = round(mean, 3)
-        print('Average CPU utilisation =', rounded_mean,'%')
+        print('Average CPU utilisation =', rounded_mean, '%')
 
 # gpu
 
     def gpu_util_timer(self):
-        for n in range(10):
+        for n in range(5):
             try:
                 GPUs = GPUtil.getGPUs()
-                gpu_load = GPUs[0].load
+                gpu_load = GPUs[0].load *100
                 Graph.gpu_y.append(gpu_load)
             except:
-                Graph.gpu_y.append(pyadl.ADLDevice.getCurrentUsage())
+                Graph.gpu_y.append(pyadl.ADLDevice.getCurrentUsage)
                 Graph.time_x.append(n)
             time.sleep(1)
 
         print(Graph.gpu_y)
-        print('gpu done')
 
     def gpu_util_mean(self):
         length = len(Graph.gpu_y)
         product = 0
         for x in range(0, length):
-            product = product + Graph.gpu_y[x]
+            product += Graph.gpu_y[x]
         mean = product / length
         rounded_mean = round(mean, 3)
-        print('Average GPU utilisation =', rounded_mean,'%')
+        print('Average GPU utilisation =', rounded_mean, '%')
 
 # ram
 
     def ram_util_timer(self):
         mem = virtual_memory()
-        for x in range(10):
+        for x in range(5):
             Graph.ram_y.append(mem.percent)
             time.sleep(1)
         print(Graph.ram_y)
-        print('ram done')
 
     def ram_util_mean(self):
         length = len(Graph.ram_y)
         product = 0
         for x in range(0, length):
-            product = product + Graph.ram_y[x]
+            product += Graph.ram_y[x]
         mean = product / length
         rounded_mean = round(mean, 3)
-        print('Average RAM utilisation =', rounded_mean,'%')
+        print('Average RAM utilisation =', rounded_mean, '%')
 
 # benchmark
 
@@ -263,7 +267,8 @@ class PcWindow(QMainWindow):
     def gpu_name(self):
         try:
             try:
-                model = GPUtil.GPU.name
+                GPUs = GPUtil.getGPUs()
+                model = GPUs[0].name
                 self.gpu_box.insertPlainText(model)
             except:
                 model = str(pyadl.ADLManager.getInstance().getDevices()[0].adapterName)
@@ -297,7 +302,6 @@ class ResWindow(QMainWindow and QWidget):
         self.cpubtn = QPushButton('CPUs', self)
         self.cpubtn.sizeHint()
         self.cpubtn.move(0, 0)
-#        self.cpubtn.clicked.connect()
         self.cpu_rec = QTextEdit(self)
         self.cpu_rec.move(0, 30)
         self.cpu_rec.setPlaceholderText('recommended CPU(s)')
@@ -307,7 +311,6 @@ class ResWindow(QMainWindow and QWidget):
         self.gpubtn = QPushButton('GPUs', self)
         self.gpubtn.sizeHint()
         self.gpubtn.move(0, 230)
-#        self.gpubtn.clicked.connect()
         self.gpu_rec = QTextEdit(self)
         self.gpu_rec.move(0, 260)
         self.gpu_rec.setPlaceholderText('recommended GPU(s)')
