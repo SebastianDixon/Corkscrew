@@ -1,6 +1,7 @@
 import Graph
 import Database
-import pyadl
+import Login
+#import pyadl
 import cpuinfo
 import os
 import psutil
@@ -19,9 +20,10 @@ class Window(QWidget and QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.window()
+        self.loginWindow()
+        self.mainWindow()
 
-    def window(self):
+    def mainWindow(self):
         self.resize(250, 250)
         self.setWindowTitle('Corkscrew')
 
@@ -33,7 +35,7 @@ class Window(QWidget and QMainWindow):
         runbtn.clicked.connect(self.open_heaven)
         runbtn.clicked.connect(self.cpu_util_timer)
         runbtn.clicked.connect(self.ram_util_timer)
-        runbtn.clicked.connect(self.gpu_util_timer)
+        # runbtn.clicked.connect(self.gpu_util_timer)
         runbtn.clicked.connect(self.cpu_util_mean)
         runbtn.clicked.connect(self.ram_util_mean)
         runbtn.clicked.connect(self.gpu_util_mean)
@@ -63,9 +65,40 @@ class Window(QWidget and QMainWindow):
 # Help Button
 
         helpBtn = QPushButton('Help', self)
-        helpBtn.resize(leadBtn.sizeHint())
+        helpBtn.resize(helpBtn.sizeHint())
         helpBtn.move(150, 150)
         helpBtn.clicked.connect(self.create_help_window)
+
+        self.show()
+
+    def loginWindow(self):
+
+        title = QLabel(self)
+        title.resize(250, 250)
+
+        username = QLineEdit(self)
+        username.move(50, 35)
+        username.resize(username.sizeHint())
+        username.setPlaceholderText("Username")
+
+        password = QLineEdit(self)
+        password.move(50, 105)
+        password.resize(password.sizeHint())
+        password.setEchoMode(QLineEdit.Password)
+        password.setPlaceholderText("Password")
+
+        log_in = QPushButton("Login", self)
+        log_in.move(50, 175)
+        log_in.resize(log_in.sizeHint())
+        #log_in.clicked.connect(Database.Database.login(self))
+
+        sign_up = QPushButton("Sign up?", self)
+        sign_up.move(150, 175)
+        sign_up.resize(sign_up.sizeHint())
+        #sign_up.clicked.connect(Database.Database.registration(self))
+
+        # username.returnPressed.connect(lambda: self.check_creds(self.username.text(), self.password.text()))
+        # password.returnPressed.connect(lambda: self.check_creds(self.username.text(), self.password.text()))
 
         self.show()
 
@@ -85,26 +118,26 @@ class Window(QWidget and QMainWindow):
         cpu_average = cpu_total / len(Graph.cpu_y)
         gpu_average = gpu_total / len(Graph.gpu_y)
 
-        Database.openFile(self)
+        Database.Database.openFile(self)
 
         if cpu_average > gpu_average:
             bottle = 'CPU'
         else:
             bottle = 'GPU'
 
-        self.notif()
+        self.note()
 
         self.result_box = QTextEdit(self)
         self.result_box.move(120, 0)
         self.result_box.setPlaceholderText('CPU')
 
-    def notif(self):
+    def note(self):
         if bottle == 'CPU':
             QMessageBox.about(self, "Notice", "Bottleneck = CPU")
-            Database.gpu_search_database(self)
+            Database.Database.getGpuDetails(self)
         else:
             QMessageBox.about(self, "Notice", "Bottleneck = GPU")
-            Database.cpu_search_database(self)
+            Database.Database.getCpuDetails(self)
         self.show()
 
 # cpu
