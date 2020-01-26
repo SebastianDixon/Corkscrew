@@ -20,7 +20,7 @@ class Window(QWidget and QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.loginWindow()
+        #self.loginWindow()
         self.mainWindow()
 
     def mainWindow(self):
@@ -90,19 +90,42 @@ class Window(QWidget and QMainWindow):
         log_in = QPushButton("Login", self)
         log_in.move(50, 175)
         log_in.resize(log_in.sizeHint())
-        #log_in.clicked.connect(Database.Database.login(self))
+        #log_in.clicked.connect(Database.login(self))
 
         sign_up = QPushButton("Sign up?", self)
         sign_up.move(150, 175)
         sign_up.resize(sign_up.sizeHint())
-        #sign_up.clicked.connect(Database.Database.registration(self))
+        #sign_up.clicked.connect(Database.registration(self))
 
-        # username.returnPressed.connect(lambda: self.check_creds(self.username.text(), self.password.text()))
-        # password.returnPressed.connect(lambda: self.check_creds(self.username.text(), self.password.text()))
+        username.returnPressed.connect(lambda: self.check_creds(self.username.text(), self.password.text()))
+        password.returnPressed.connect(lambda: self.check_creds(self.username.text(), self.password.text()))
 
         self.show()
 
+
 # bottleneck calculator
+
+    def check_creds(self, username, password):
+
+        """
+        Checks the credentials in the username and password widgets.
+        """
+
+        details = self.database.getDetails("credentials", username)
+
+        if details == None:
+            self.username.setStyleSheet(self.wrong_menu_input_style_sheet)
+            return
+
+        hashed, salt = details['password'], details['salt']
+
+        if hash_string(password + salt) == hashed:
+            self.profile_name = username
+            self.main_menu()
+
+        else:
+            self.username.setStyleSheet(self.wrong_menu_input_style_sheet)
+            self.password.setStyleSheet(self.wrong_menu_input_style_sheet)
 
     def util_difference(self):
         global bottle
@@ -118,7 +141,7 @@ class Window(QWidget and QMainWindow):
         cpu_average = cpu_total / len(Graph.cpu_y)
         gpu_average = gpu_total / len(Graph.gpu_y)
 
-        Database.Database.openFile(self)
+        Database.openFile(self)
 
         if cpu_average > gpu_average:
             bottle = 'CPU'
@@ -134,10 +157,10 @@ class Window(QWidget and QMainWindow):
     def note(self):
         if bottle == 'CPU':
             QMessageBox.about(self, "Notice", "Bottleneck = CPU")
-            Database.Database.getGpuDetails(self)
+            Database.getGpuDetails(self)
         else:
             QMessageBox.about(self, "Notice", "Bottleneck = GPU")
-            Database.Database.getCpuDetails(self)
+            Database.getCpuDetails(self)
         self.show()
 
 # cpu
