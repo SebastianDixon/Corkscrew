@@ -1,6 +1,5 @@
 import pyqtgraph as pg
 
-
 cpu_y = []
 gpu_y = [24,52,65,23,11]
 ram_y = []

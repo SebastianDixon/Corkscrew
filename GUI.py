@@ -20,112 +20,108 @@ class Window(QWidget and QMainWindow):
 
     def __init__(self):
         super().__init__()
-        #self.loginWindow()
-        self.mainWindow()
+        self.widgets = []
+        self.loginWindow()
+
+    def delete_current_widgets(self):
+        try:
+
+            for i in range(len(self.widgets)):
+                if type(self.widgets[0]) is not str:
+                    self.widgets[0].deleteLater()
+                self.widgets.remove(self.widgets[0])
+
+        except RuntimeError:
+            print("no1")
+
+    def show_widgets(self):
+        try:
+            for widget in self.widgets:
+                widget.show()
+
+        except RuntimeError:
+            print("no2")
 
     def mainWindow(self):
+        self.delete_current_widgets()
         self.resize(250, 250)
         self.setWindowTitle('Corkscrew')
 
-# run
+        self.runBtn = QPushButton('RUN, START, GO, BEGIN', self)
+        self.runBtn.setGeometry(20, 20, 210, 30)
+        self.runBtn.clicked.connect(self.open_heaven)
+        self.runBtn.clicked.connect(self.cpu_util_timer)
+        self.runBtn.clicked.connect(self.ram_util_timer)
+        # runBtn.clicked.connect(self.gpu_util_timer)
+        self.runBtn.clicked.connect(self.cpu_util_mean)
+        self.runBtn.clicked.connect(self.ram_util_mean)
+        self.runBtn.clicked.connect(self.gpu_util_mean)
+        self.runBtn.clicked.connect(self.util_difference)
 
-        runbtn = QPushButton('RUN, START, GO, BEGIN', self)
-        runbtn.setGeometry(20, 20, 210, 30)
+        self.graph = QPushButton('Graph', self)
+        self.graph.resize(self.graph.sizeHint())
+        self.graph.move(20, 150)
+        self.graph.clicked.connect(self.output_util_graphs())
 
-        runbtn.clicked.connect(self.open_heaven)
-        runbtn.clicked.connect(self.cpu_util_timer)
-        runbtn.clicked.connect(self.ram_util_timer)
-        # runbtn.clicked.connect(self.gpu_util_timer)
-        runbtn.clicked.connect(self.cpu_util_mean)
-        runbtn.clicked.connect(self.ram_util_mean)
-        runbtn.clicked.connect(self.gpu_util_mean)
-        runbtn.clicked.connect(self.util_difference)
+        self.pcBtn = QPushButton('My PC', self)
+        self.pcBtn.resize(self.pcBtn.sizeHint())
+        self.pcBtn.move(20, 90)
+        self.pcBtn.clicked.connect(self.create_window)
 
-# analysis button
+        self.leadBtn = QPushButton('Results', self)
+        self.leadBtn.resize(self.leadBtn.sizeHint())
+        self.leadBtn.move(150, 90)
+        self.leadBtn.clicked.connect(self.create_leader_window)
 
-        graph = QPushButton('Graph', self)
-        graph.resize(graph.sizeHint())
-        graph.move(20, 150)
-        graph.clicked.connect(self.output_util_graphs())
+        self.helpBtn = QPushButton('Help', self)
+        self.helpBtn.resize(self.helpBtn.sizeHint())
+        self.helpBtn.move(150, 150)
+        self.helpBtn.clicked.connect(self.create_help_window)
 
-# PC Buttons
+        self.delete_current_widgets()
+        self.widgets = [self.runBtn, self.graph, self.pcBtn, self.leadBtn, self.helpBtn]
+        self.show_widgets()
 
-        pcbtn = QPushButton('My PC', self)
-        pcbtn.resize(pcbtn.sizeHint())
-        pcbtn.move(20, 90)
-        pcbtn.clicked.connect(self.create_window)
-
-# Leaderboard Buttons
-
-        leadBtn = QPushButton('Results', self)
-        leadBtn.resize(leadBtn.sizeHint())
-        leadBtn.move(150, 90)
-        leadBtn.clicked.connect(self.create_leader_window)
-
-# Help Button
-
-        helpBtn = QPushButton('Help', self)
-        helpBtn.resize(helpBtn.sizeHint())
-        helpBtn.move(150, 150)
-        helpBtn.clicked.connect(self.create_help_window)
-
-        self.show()
+# account info
 
     def loginWindow(self):
+        self.delete_current_widgets()
+        self.resize(250, 250)
+        self.setWindowTitle('Corkscrew')
 
-        title = QLabel(self)
-        title.resize(250, 250)
+        self.username = QLineEdit(self)
+        self.username.move(50, 35)
+        self.username.resize(self.username.sizeHint())
+        self.username.setPlaceholderText("Username")
 
-        username = QLineEdit(self)
-        username.move(50, 35)
-        username.resize(username.sizeHint())
-        username.setPlaceholderText("Username")
+        self.password = QLineEdit(self)
+        self.password.move(50, 105)
+        self.password.resize(self.password.sizeHint())
+        self.password.setEchoMode(QLineEdit.Password)
+        self.password.setPlaceholderText("Password")
 
-        password = QLineEdit(self)
-        password.move(50, 105)
-        password.resize(password.sizeHint())
-        password.setEchoMode(QLineEdit.Password)
-        password.setPlaceholderText("Password")
+        self.log_in = QPushButton("Login", self)
+        self.log_in.move(50, 175)
+        self.log_in.resize(self.log_in.sizeHint())
 
-        log_in = QPushButton("Login", self)
-        log_in.move(50, 175)
-        log_in.resize(log_in.sizeHint())
-        #log_in.clicked.connect(Database.login(self))
+        self.sign_up = QPushButton("Sign up", self)
+        self.sign_up.move(150, 175)
+        self.sign_up.resize(self.sign_up.sizeHint())
 
-        sign_up = QPushButton("Sign up?", self)
-        sign_up.move(150, 175)
-        sign_up.resize(sign_up.sizeHint())
-        #sign_up.clicked.connect(Database.registration(self))
+        self.sign_up.clicked.connect(lambda: self.reg_connect(self.username.text(), self.password.text()))
+        self.log_in.clicked.connect(lambda: self.sign_connect(self.username.text(), self.password.text()))
 
-        username.returnPressed.connect(lambda: self.check_creds(self.username.text(), self.password.text()))
-        password.returnPressed.connect(lambda: self.check_creds(self.username.text(), self.password.text()))
-
+        self.widgets = [self.username, self.password, self.sign_up]
+        self.show_widgets()
         self.show()
 
+    def reg_connect(self, username, password):
+        return Database.Database.registration(self, username, password)
+
+    def sign_connect(self, username, password):
+        return Database.Database.login(self, username, password)
 
 # bottleneck calculator
-
-    def check_creds(self, username, password):
-
-        """
-        Checks the credentials in the username and password widgets.
-        """
-
-        details = self.database.getDetails("credentials", username)
-
-        if details == None:
-            self.username.setStyleSheet(self.wrong_menu_input_style_sheet)
-            return
-
-        hashed, salt = details['password'], details['salt']
-
-        if hash_string(password + salt) == hashed:
-            self.profile_name = username
-            self.main_menu()
-
-        else:
-            self.username.setStyleSheet(self.wrong_menu_input_style_sheet)
-            self.password.setStyleSheet(self.wrong_menu_input_style_sheet)
 
     def util_difference(self):
         global bottle
@@ -141,7 +137,7 @@ class Window(QWidget and QMainWindow):
         cpu_average = cpu_total / len(Graph.cpu_y)
         gpu_average = gpu_total / len(Graph.gpu_y)
 
-        Database.openFile(self)
+        Database.Database.openFile(self)
 
         if cpu_average > gpu_average:
             bottle = 'CPU'
@@ -157,10 +153,10 @@ class Window(QWidget and QMainWindow):
     def note(self):
         if bottle == 'CPU':
             QMessageBox.about(self, "Notice", "Bottleneck = CPU")
-            Database.getGpuDetails(self)
+            Database.Database.getGpuDetails(self)
         else:
             QMessageBox.about(self, "Notice", "Bottleneck = GPU")
-            Database.getCpuDetails(self)
+            Database.Database.getCpuDetails(self)
         self.show()
 
 # cpu
