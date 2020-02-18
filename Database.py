@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import os
 import hashlib
 import GUI
+import cryptography
 
 results = []
 recommend_cpu = []
@@ -12,14 +13,13 @@ recommend_gpu = []
 
 class Database():
 
-    def __init__(self, localhost, root, password, Hardware, utf8mb4, cursorclass):
-
-        self.connection = pymysql.connect(host= localhost,
-                                          user= root,
-                                          password= password,
-                                          db= Hardware,
-                                          charset= utf8mb4,
-                                          cursorclass= cursorclass)
+    def __init__(self):
+        self.connection = pymysql.connect(host='localhost',
+                                          user='root',
+                                          password='password',
+                                          db='Hardware',
+                                          charset='utf8mb4',
+                                          cursorclass= pymysql.cursors.DictCursor)
 
     def openFile(self):
         options = QFileDialog.Options()
@@ -38,26 +38,35 @@ class Database():
 
     def registration(self, user1, password):
         Database.salt_hash(self, password)
+        users = []
 
         try:
             with self.connection.cursor() as cursor:
-                total = "SELECT COUNT(*) FROM Hardware.Login"
-                total_num = int(total)
-                total_str = str(total_num + 1)
-
+                total = cursor.execute("SELECT COUNT(*) FROM Hardware.Login")
+                total_str = str(total + 1)
                 sql = "SELECT `Username` FROM Hardware.Login WHERE `UserID` = %s"
-                existingusercount = len([1 for r in cursor.execute(sql, user1)])
+                for i in range(total+1):
+                    str_i = str(i)
+                    sql = cursor.execute(sql, str_i)
+                    if sql == user1:
+                        users.append(sql)
+                existingusercount = len(users)
 
-                if existingusercount > 0:
+                if existingusercount == 1:
                     print('username taken')
-                    return GUI.Window.loginWindow()
+                    return self.reject_user()
                 else:
-                    reg = "INSERT INTO Hardware.Login(Username, PasswordHash, UserID) VALUES(%s, %s, %s)"
-                    cursor.execute(reg, user1, password, total_str)
+                    cursor.execute("INSERT INTO Hardware.Login(Username) VALUES(%s)", user1)
+                    cursor.execute("INSERT INTO Hardware.Login(PasswordHash) VALUES(%s)", password)
+                    cursor.execute("INSERT INTO Hardware.Login(UserID) VALUES(%s)", total_str)
             self.connection.commit()
 
         except pymysql.err.IntegrityError:
             print('Wrong')
+
+    def reject_user(self):
+        gui = GUI.Window()
+        return gui.loginWindow()
 
     def login(self, user2, password):
         print('login')
@@ -65,6 +74,7 @@ class Database():
     def salt_hash(self, plain_word):
         salt = os.urandom(32)
         pass_key = hashlib.pbkdf2_hmac('sha256', plain_word.encode('utf-8'), salt, 100000)
+        print(pass_key)
         return pass_key
 
     def pop_name(self):
@@ -72,10 +82,10 @@ class Database():
         if okPressed and text != '':
             return text
         elif okPressed and text == '':
-            self.pop_name(self)
+            self.pop_name()
 
     def getCpuDetails(self):
-        item = self.pop_name(self)
+        item = self.pop_name()
 
         try:
             with self.connection.cursor() as cursor:
@@ -91,7 +101,7 @@ class Database():
             print('Wrong')
 
     def getGpuDetails(self):
-        item = self.pop_name(self)
+        item = self.pop_name()
 
         try:
             with self.connection.cursor() as cursor:

@@ -116,10 +116,12 @@ class Window(QWidget and QMainWindow):
         self.show()
 
     def reg_connect(self, username, password):
-        return Database.Database.registration(self, username, password)
+        db = Database.Database()
+        return db.registration(username, password)
 
     def sign_connect(self, username, password):
-        return Database.Database.login(self, username, password)
+        db = Database.Database()
+        return db.login(username, password)
 
 # bottleneck calculator
 
