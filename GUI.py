@@ -119,6 +119,10 @@ class Window(QWidget and QMainWindow):
         db = Database.Database()
         return db.registration(username, password)
 
+    def reject_reg(self):
+        QMessageBox.about(self, "Notice", "Username taken")
+        self.show()
+
     def sign_connect(self, username, password):
         db = Database.Database()
         return db.login(username, password)

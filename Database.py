@@ -40,14 +40,12 @@ class Database():
         salt = os.urandom(32)
         pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
         key_string = str(pass_key)
-
-        users = []
+        salt_str = str(salt)
 
         try:
             with self.connection.cursor() as cursor:
                 last_row = cursor.execute("SELECT `UserID` FROM Hardware.Login")
                 new_row = last_row+1
-                print('new row =', new_row)
 
                 update_sql1 = "UPDATE Hardware.Login SET `Username` = %s WHERE `UserID` = %s"
                 data1 = (user1, new_row)
@@ -55,32 +53,58 @@ class Database():
                 update_sql2 = "UPDATE Hardware.Login SET `PasswordHash` = %s WHERE `UserID` = %s"
                 data2 = (key_string, new_row)
 
-                sql = cursor.execute("SELECT `Username` FROM Hardware.Login")
-                if sql == user1:
-                    print('username taken')
-                    return self.reject_user()
-                else:
-                    cursor.execute("INSERT INTO Hardware.Login(UserID) VALUES(%s)", new_row)
-                    cursor.execute(update_sql1, data1)
-                    cursor.execute(update_sql2, data2)
+                salt_push = "UPDATE Hardware.Login SET `PasswordSalt` = %s WHERE `UserID` = %s"
+                data3 = (salt_str, new_row)
 
-            self.connection.commit()
+                sql = cursor.execute("SELECT `Username` FROM Hardware.Login")
+                rows = cursor.fetchone()
+                for row in rows:
+                    if row == user1:
+                        print('username taken')
+                        return self.reject_user()
+                    else:
+                        cursor.execute("INSERT INTO Hardware.Login(UserID) VALUES(%s)", new_row)
+                        cursor.execute(update_sql1, data1)
+                        cursor.execute(update_sql2, data2)
+                        cursor.execute(salt_push, data3)
+
+                self.connection.commit()
 
         except pymysql.err.IntegrityError:
             print('Wrong')
 
-    def reject_user(self):
-        gui = GUI.Window()
-        return gui.loginWindow()
-
     def login(self, user2, password):
-        print('login')
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute("SELECT `PasswordSalt` FROM Hardware.Login WHERE `Username` = %s", user2)
+                rows1 = cursor.fetchone()
+                for row in rows1:
+                    pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), row, 100000)
+
+                cursor.execute("SELECT `PasswordHash` FROM Hardware.Login WHERE `Username` = %s", user2)
+                rows2 = cursor.fetchone()
+                for row in rows2:
+                    if pass_key == row:
+                        print('correct password')
+                    else:
+                        print('wrong password')
+                        return self.reject_user()
+
+                self.connection.commit()
+
+        except pymysql.err.IntegrityError:
+            print('Wrong')
 
     def salt_hash(self, plain_word):
         salt = os.urandom(32)
         pass_key = hashlib.pbkdf2_hmac('sha256', plain_word.encode('utf-8'), salt, 100000)
         print(pass_key)
         return pass_key
+
+    def reject_user(self):
+        gui = GUI.Window()
+        gui.reject_reg()
+        return gui.loginWindow()
 
     def pop_name(self):
         text, okPressed = QInputDialog.getText(self, "Component Name", "name:", QLineEdit.Normal, "")
