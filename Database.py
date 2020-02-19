@@ -37,28 +37,33 @@ class Database():
         print('Fps =', results[0])
 
     def registration(self, user1, password):
-        Database.salt_hash(self, password)
+        salt = os.urandom(32)
+        pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+        key_string = str(pass_key)
+
         users = []
 
         try:
             with self.connection.cursor() as cursor:
-                total = cursor.execute("SELECT COUNT(*) FROM Hardware.Login")
-                total_str = str(total + 1)
-                sql = "SELECT `Username` FROM Hardware.Login WHERE `UserID` = %s"
-                for i in range(total+1):
-                    str_i = str(i)
-                    sql = cursor.execute(sql, str_i)
-                    if sql == user1:
-                        users.append(sql)
-                existingusercount = len(users)
+                last_row = cursor.execute("SELECT `UserID` FROM Hardware.Login")
+                new_row = last_row+1
+                print('new row =', new_row)
 
-                if existingusercount == 1:
+                update_sql1 = "UPDATE Hardware.Login SET `Username` = %s WHERE `UserID` = %s"
+                data1 = (user1, new_row)
+
+                update_sql2 = "UPDATE Hardware.Login SET `PasswordHash` = %s WHERE `UserID` = %s"
+                data2 = (key_string, new_row)
+
+                sql = cursor.execute("SELECT `Username` FROM Hardware.Login")
+                if sql == user1:
                     print('username taken')
                     return self.reject_user()
                 else:
-                    cursor.execute("INSERT INTO Hardware.Login(Username) VALUES(%s)", user1)
-                    cursor.execute("INSERT INTO Hardware.Login(PasswordHash) VALUES(%s)", password)
-                    cursor.execute("INSERT INTO Hardware.Login(UserID) VALUES(%s)", total_str)
+                    cursor.execute("INSERT INTO Hardware.Login(UserID) VALUES(%s)", new_row)
+                    cursor.execute(update_sql1, data1)
+                    cursor.execute(update_sql2, data2)
+
             self.connection.commit()
 
         except pymysql.err.IntegrityError:
