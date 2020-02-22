@@ -56,10 +56,10 @@ class Database():
                 salt_push = "UPDATE Hardware.Login SET `PasswordSalt` = %s WHERE `UserID` = %s"
                 data3 = (salt_str, new_row)
 
-                sql = cursor.execute("SELECT `Username` FROM Hardware.Login")
-                rows = cursor.fetchone()
-                for row in rows:
-                    if row == user1:
+                for i in range(1, last_row):
+                    cursor.execute("SELECT `Username` FROM Hardware.Login WHERE `UserID` = %s", i)
+                    rows = cursor.fetchone()
+                    if rows["Username"] == user1:
                         print('username taken')
                         return self.reject_user()
                     else:
@@ -78,17 +78,15 @@ class Database():
             with self.connection.cursor() as cursor:
                 cursor.execute("SELECT `PasswordSalt` FROM Hardware.Login WHERE `Username` = %s", user2)
                 rows1 = cursor.fetchone()
-                for row in rows1:
-                    pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), row, 100000)
+                pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), rows1["PasswordSalt"], 100000)
 
                 cursor.execute("SELECT `PasswordHash` FROM Hardware.Login WHERE `Username` = %s", user2)
                 rows2 = cursor.fetchone()
-                for row in rows2:
-                    if pass_key == row:
-                        print('correct password')
-                    else:
-                        print('wrong password')
-                        return self.reject_user()
+                if pass_key == rows2['PasswordHash']:
+                    print('correct password')
+                else:
+                    print('wrong password')
+                    return self.reject_user()
 
                 self.connection.commit()
 

@@ -120,7 +120,7 @@ class Window(QWidget and QMainWindow):
         return db.registration(username, password)
 
     def reject_reg(self):
-        QMessageBox.about(self, "Notice", "Username taken")
+        QMessageBox.about(self, "Notice", "Username invalid")
         self.show()
 
     def sign_connect(self, username, password):
