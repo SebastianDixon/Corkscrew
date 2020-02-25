@@ -63,22 +63,32 @@ class Database():
                         print('username taken')
                         return self.reject_user()
                     else:
-                        cursor.execute("INSERT INTO Hardware.Login(UserID) VALUES(%s)", new_row)
-                        cursor.execute(update_sql1, data1)
-                        cursor.execute(update_sql2, data2)
-                        cursor.execute(salt_push, data3)
+                        print('not taken')
+
+                cursor.execute("INSERT INTO Hardware.Login(UserID) VALUES(%s)", new_row)
+                cursor.execute(update_sql1, data1)
+                cursor.execute(update_sql2, data2)
+                cursor.execute(salt_push, data3)
 
                 self.connection.commit()
 
         except pymysql.err.IntegrityError:
             print('Wrong')
 
+        gui = GUI.Window()
+        next_win = gui.mainWindow()
+        return next_win
+
     def login(self, user2, password):
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("SELECT `PasswordSalt` FROM Hardware.Login WHERE `Username` = %s", user2)
                 rows1 = cursor.fetchone()
-                pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), rows1["PasswordSalt"], 100000)
+                new_sec = rows1["PasswordSalt"]
+                remove_b = new_sec[1:-1]
+                part1 = "b'"; part2 = "'"
+                finalpart = part1+remove_b+part2
+                pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), finalpart, 100000)
 
                 cursor.execute("SELECT `PasswordHash` FROM Hardware.Login WHERE `Username` = %s", user2)
                 rows2 = cursor.fetchone()
@@ -112,36 +122,52 @@ class Database():
             self.pop_name()
 
     def getCpuDetails(self):
-        item = self.pop_name()
-
+        temp = []
+        temp2 = []
         try:
             with self.connection.cursor() as cursor:
-                print("Searching for ", item)
-                sql = "SELECT `GPU` FROM Hardware.Parts WHERE `CPU` = %s"
-                cursor.execute(sql, item)
-                for row in cursor.fetchall():
-                    recommend_cpu.append(row['GPU'])
+                cursor.execute("SELECT `GPU` FROM Hardware.Parts WHERE CPU = 6700")
+                rows = cursor.fetchall()
+                for i in range(0, len(rows)):
+                    found = rows[i]['GPU']
+                    temp.append(found)
+                for n in range(len(temp)):
+                    val = temp[n]
+                    new_val = val[0:-1]
+                    temp2.append(new_val)
 
             self.connection.commit()
 
         except pymysql.err.IntegrityError:
             print('Wrong')
+
+        recommend_cpu = list(dict.fromkeys(temp2))
+        print(recommend_cpu)
+        return recommend_cpu
 
     def getGpuDetails(self):
-        item = self.pop_name()
-
+        temp = []
+        temp2 = []
         try:
             with self.connection.cursor() as cursor:
-                print("Searching for ", item)
-                sql = "SELECT" + "`CPU`" + "FROM `" + "`Hardware.Parts`" + "`WHERE`" + "`GPU`" + "` = '" + item + "'"
-                cursor.execute(sql)
-                for row in cursor.fetchall():
-                    recommend_gpu.append(row['CPU'])
+                cursor.execute("SELECT `CPU` FROM Hardware.Parts WHERE GPU = 1080")
+                rows = cursor.fetchall()
+                for i in range(0, len(rows)):
+                    found = rows[i]['CPU']
+                    temp.append(found)
+                for n in range(len(temp)):
+                    val = temp[n]
+                    new_val = val[0:-1]
+                    temp2.append(new_val)
 
             self.connection.commit()
 
         except pymysql.err.IntegrityError:
             print('Wrong')
+
+        recommend_gpu = list(dict.fromkeys(temp2))
+        print(recommend_gpu)
+        return recommend_gpu
 
     def cpu_URL(self):
         part1 = 'https://www.amazon.co.uk/s?k='

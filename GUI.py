@@ -47,7 +47,7 @@ class Window(QWidget and QMainWindow):
         self.resize(250, 250)
         self.setWindowTitle('Corkscrew')
 
-        self.runBtn = QPushButton('RUN, START, GO, BEGIN', self)
+        self.runBtn = QPushButton('RUN BENCHMARK', self)
         self.runBtn.setGeometry(20, 20, 210, 30)
         self.runBtn.clicked.connect(self.open_heaven)
         self.runBtn.clicked.connect(self.cpu_util_timer)
@@ -157,12 +157,14 @@ class Window(QWidget and QMainWindow):
         self.result_box.setPlaceholderText('CPU')
 
     def note(self):
+        db = Database.Database()
+
         if bottle == 'CPU':
             QMessageBox.about(self, "Notice", "Bottleneck = CPU")
-            Database.Database.getGpuDetails(self)
+            db.getGpuDetails()
         else:
             QMessageBox.about(self, "Notice", "Bottleneck = GPU")
-            Database.Database.getCpuDetails(self)
+            db.getCpuDetails()
         self.show()
 
 # cpu
