@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import os
 import hashlib
 import GUI
-import cryptography
+import cryptography 
 
 results = []
 recommend_cpu = []
@@ -23,14 +23,14 @@ class Database():
 
     def openFile(self):
         options = QFileDialog.Options()
-
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        fileName, _ = QFileDialog.getOpenFileName(None, "QFileDialog.getOpenFileName()", "",
                                                   "All Files (*);;Python Files (*.py)", options=options)
+
         if fileName:
             file = open(fileName)
             data = file.read()
-            soup = BeautifulSoup(data, "lxml")
+            soup = BeautifulSoup(data)
             for item in soup.find_all('strong'):
                 results.append(float(item.text))
         print('Score =', results[1])
@@ -56,10 +56,11 @@ class Database():
                 salt_push = "UPDATE Hardware.Login SET `PasswordSalt` = %s WHERE `UserID` = %s"
                 data3 = (salt_str, new_row)
 
-                for i in range(1, last_row):
-                    cursor.execute("SELECT `Username` FROM Hardware.Login WHERE `UserID` = %s", i)
-                    rows = cursor.fetchone()
-                    if rows["Username"] == user1:
+                cursor.execute("SELECT `Username` FROM Hardware.Login")
+                rows =   cursor.fetchall()
+                for i in range(0, last_row-1):
+                    value = rows[i]['Username']
+                    if value == user1: 
                         print('username taken')
                         return self.reject_user()
                     else:
@@ -76,8 +77,7 @@ class Database():
             print('Wrong')
 
         gui = GUI.Window()
-        next_win = gui.mainWindow()
-        return next_win
+        return gui.mainWindow()
 
     def login(self, user2, password):
         try:

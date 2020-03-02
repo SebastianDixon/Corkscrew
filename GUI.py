@@ -25,8 +25,7 @@ class Window(QWidget and QMainWindow):
 
     def delete_current_widgets(self):
         try:
-
-            for i in range(len(self.widgets)):
+            for _ in range(len(self.widgets)):
                 if type(self.widgets[0]) is not str:
                     self.widgets[0].deleteLater()
                 self.widgets.remove(self.widgets[0])
@@ -81,6 +80,7 @@ class Window(QWidget and QMainWindow):
         self.delete_current_widgets()
         self.widgets = [self.runBtn, self.graph, self.pcBtn, self.leadBtn, self.helpBtn]
         self.show_widgets()
+        self.show()
 
 # account info
 
@@ -213,7 +213,7 @@ class Window(QWidget and QMainWindow):
 
     def ram_util_timer(self):
         mem = virtual_memory()
-        for x in range(5):
+        for _ in range(5):
             Graph.ram_y.append(mem.percent)
             time.sleep(1)
         print(Graph.ram_y)
@@ -285,7 +285,7 @@ class PcWindow(QMainWindow):
         self.resize(250, 250)
         self.move(0,0)
 
-# cpu
+ # cpu
         self.cpu1btn = QPushButton('CPU Type', self)
         self.cpu1btn.sizeHint()
         self.cpu1btn.move(0,0)
@@ -294,7 +294,7 @@ class PcWindow(QMainWindow):
         self.cpu_box.move(120,0)
         self.cpu_box.setPlaceholderText('CPU')
 
-# gpu
+  # gpu
         self.gpu1btn = QPushButton('GPU', self)
         self.gpu1btn.sizeHint()
         self.gpu1btn.move(0, 75)
@@ -303,7 +303,7 @@ class PcWindow(QMainWindow):
         self.gpu_box.setPlaceholderText('GPU')
         self.gpu_box.move(120, 75)
 
-# ram
+ # ram
 
         self.rambtn = QPushButton('RAM', self)
         self.rambtn.sizeHint()
@@ -315,7 +315,7 @@ class PcWindow(QMainWindow):
 
         self.show()
 
-# functions
+ # functions
 
     def cpu_name(self):
         before = cpuinfo.get_cpu_info()['brand']
@@ -346,7 +346,7 @@ class PcWindow(QMainWindow):
         self.ram_box.insertPlainText(units)
 
 
-class ResWindow(QMainWindow and QWidget):
+class ResWindow(QMainWindow and QWidget): 
 
     def __init__(self):
         super().__init__()
@@ -357,7 +357,7 @@ class ResWindow(QMainWindow and QWidget):
         self.setWindowTitle('Results')
         self.move(250,0)
 
-# cpu
+ # cpu
 
         self.cpubtn = QPushButton('CPUs', self)
         self.cpubtn.sizeHint()
@@ -366,7 +366,7 @@ class ResWindow(QMainWindow and QWidget):
         self.cpu_rec.move(0, 30)
         self.cpu_rec.setPlaceholderText('recommended CPU(s)')
 
-# gpu
+ # gpu
 
         self.gpubtn = QPushButton('GPUs', self)
         self.gpubtn.sizeHint()
