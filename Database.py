@@ -57,7 +57,7 @@ class Database():
                 data3 = (salt_str, new_row)
 
                 cursor.execute("SELECT `Username` FROM Hardware.Login")
-                rows =   cursor.fetchall()
+                rows = cursor.fetchall()
                 for i in range(0, last_row-1):
                     value = rows[i]['Username']
                     if value == user1: 
@@ -83,25 +83,32 @@ class Database():
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("SELECT `PasswordSalt` FROM Hardware.Login WHERE `Username` = %s", user2)
-                rows1 = cursor.fetchone()
-                new_sec = rows1["PasswordSalt"]
-                remove_b = new_sec[1:-1]
-                part1 = "b'"; part2 = "'"
-                finalpart = part1+remove_b+part2
-                pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), finalpart, 100000)
+                row = cursor.fetchone()
+                pullsalt = row['PasswordSalt']
+                remove_b = pullsalt[2:-1]
+                
+                b = bytes(remove_b, 'utf-8')
+                pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), b, 100000)
+                key_string = str(pass_key)
 
                 cursor.execute("SELECT `PasswordHash` FROM Hardware.Login WHERE `Username` = %s", user2)
                 rows2 = cursor.fetchone()
-                if pass_key == rows2['PasswordHash']:
+                val = rows2['PasswordHash']
+                new_val = str(val)
+
+                if key_string == new_val:
                     print('correct password')
                 else:
                     print('wrong password')
-                    return self.reject_user()
+                    #return self.reject_user()
 
                 self.connection.commit()
 
         except pymysql.err.IntegrityError:
             print('Wrong')
+
+        gui = GUI.Window()
+        return gui.mainWindow()
 
     def salt_hash(self, plain_word):
         salt = os.urandom(32)
@@ -127,9 +134,9 @@ class Database():
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("SELECT `GPU` FROM Hardware.Parts WHERE CPU = 6700")
-                rows = cursor.fetchall()
-                for i in range(0, len(rows)):
-                    found = rows[i]['GPU']
+                rows3 = cursor.fetchall()
+                for i in range(0, len(rows3)):
+                    found = rows3[i]['GPU']
                     temp.append(found)
                 for n in range(len(temp)):
                     val = temp[n]
@@ -143,6 +150,18 @@ class Database():
 
         recommend_cpu = list(dict.fromkeys(temp2))
         print(recommend_cpu)
+
+        part1 = 'https://www.amazon.co.uk/s?k='
+        part2 = '&ref=nb_sb_noss_2'
+        for i in range(0, len(recommend_cpu)):
+            try:
+                split1 = recommend_cpu[i].split(' ')
+                joined = split1[0] + split1[1]
+                url = part1 + joined + part2
+            except:
+                url = part1 + recommend_cpu[i] + part2
+            print(url)
+    
         return recommend_cpu
 
     def getGpuDetails(self):
@@ -167,6 +186,15 @@ class Database():
 
         recommend_gpu = list(dict.fromkeys(temp2))
         print(recommend_gpu)
+
+        part1 = 'https://www.amazon.co.uk/s?k='
+        part2 = '&ref=nb_sb_noss_2'
+        for i in range(0, len(recommend_gpu)):
+            split1 = recommend_gpu[i].split(' ')
+            joined = split1[0] + split1[1]
+            url = part1 + joined + part2
+            print(url)
+
         return recommend_gpu
 
     def cpu_URL(self):

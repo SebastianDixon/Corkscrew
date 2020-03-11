@@ -1,7 +1,7 @@
 import pyqtgraph as pg
 
 cpu_y = []
-gpu_y = [24,52,65,23,11]
+gpu_y = []
 ram_y = []
 time_x = []
 

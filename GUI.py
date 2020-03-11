@@ -1,6 +1,5 @@
 import Graph
 import Database
-import Login
 #import pyadl
 import cpuinfo
 import os
@@ -49,9 +48,10 @@ class Window(QWidget and QMainWindow):
         self.runBtn = QPushButton('RUN BENCHMARK', self)
         self.runBtn.setGeometry(20, 20, 210, 30)
         self.runBtn.clicked.connect(self.open_heaven)
+        self.runBtn.clicked.connect(self.gpu_util_timer)
+
         self.runBtn.clicked.connect(self.cpu_util_timer)
         self.runBtn.clicked.connect(self.ram_util_timer)
-        # runBtn.clicked.connect(self.gpu_util_timer)
         self.runBtn.clicked.connect(self.cpu_util_mean)
         self.runBtn.clicked.connect(self.ram_util_mean)
         self.runBtn.clicked.connect(self.gpu_util_mean)
@@ -82,7 +82,7 @@ class Window(QWidget and QMainWindow):
         self.show_widgets()
         self.show()
 
-# account info
+    # account info
 
     def loginWindow(self):
         self.delete_current_widgets()
@@ -127,7 +127,7 @@ class Window(QWidget and QMainWindow):
         db = Database.Database()
         return db.login(username, password)
 
-# bottleneck calculator
+    # bottleneck calculator
 
     def util_difference(self):
         global bottle
@@ -167,10 +167,10 @@ class Window(QWidget and QMainWindow):
             db.getCpuDetails()
         self.show()
 
-# cpu
+    # cpu
 
     def cpu_util_timer(self):
-        for n in range(5):
+        for n in range(100):
             Graph.cpu_y.append(psutil.cpu_percent())
             Graph.time_x.append(n)
             time.sleep(1)
@@ -185,10 +185,10 @@ class Window(QWidget and QMainWindow):
         rounded_mean = round(mean, 3)
         print('Average CPU utilisation =', rounded_mean, '%')
 
-# gpu
+    # gpu
 
     def gpu_util_timer(self):
-        for n in range(5):
+        for n in range(100):
             try:
                 GPUs = GPUtil.getGPUs()
                 gpu_load = GPUs[0].load *100
@@ -209,11 +209,11 @@ class Window(QWidget and QMainWindow):
         rounded_mean = round(mean, 3)
         print('Average GPU utilisation =', rounded_mean, '%')
 
-# ram
+    # ram
 
     def ram_util_timer(self):
         mem = virtual_memory()
-        for _ in range(5):
+        for _ in range(100):
             Graph.ram_y.append(mem.percent)
             time.sleep(1)
         print(Graph.ram_y)
@@ -227,7 +227,7 @@ class Window(QWidget and QMainWindow):
         rounded_mean = round(mean, 3)
         print('Average RAM utilisation =', rounded_mean, '%')
 
-# benchmark
+    # benchmark
 
     def open_heaven(self):
         try:
@@ -238,7 +238,7 @@ class Window(QWidget and QMainWindow):
             subprocess.call(
                 ["/usr/bin/open", "-W", "-n", "-a", "/Applications/Heaven.app"])
 
-# random
+    # random
 
     def output_util_graphs(self):
         return Graph.util_graphs
@@ -254,6 +254,7 @@ class Window(QWidget and QMainWindow):
 
 
 class HelpWindow(QMainWindow):
+    
     def __init__(self):
         super().__init__()
         self.FourthWindow()
@@ -294,7 +295,7 @@ class PcWindow(QMainWindow):
         self.cpu_box.move(120,0)
         self.cpu_box.setPlaceholderText('CPU')
 
-  # gpu
+ # gpu
         self.gpu1btn = QPushButton('GPU', self)
         self.gpu1btn.sizeHint()
         self.gpu1btn.move(0, 75)
