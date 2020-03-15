@@ -7,8 +7,11 @@ import GUI
 import cryptography 
 
 results = []
-recommend_cpu = []
-recommend_gpu = []
+recommend_cpu = ['thingsss', 'superlongname123', 'short', 'this', 'that']
+recommend_cpu_url = ['www.google.com']
+recommend_gpu = ['gpus', 'are', 'superduper', 'awesome', 'and', 'fast', 'and', 'expensive']
+recommend_gpu_url = ['www.bing.com']
+
 
 
 class Database():
@@ -86,8 +89,9 @@ class Database():
                 row = cursor.fetchone()
                 pullsalt = row['PasswordSalt']
                 remove_b = pullsalt[2:-1]
+                remove_d = (remove_b.replace('\\', ''))
                 
-                b = bytes(remove_b, 'utf-8')
+                b = bytes(remove_d, 'utf-8')
                 pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), b, 100000)
                 key_string = str(pass_key)
 

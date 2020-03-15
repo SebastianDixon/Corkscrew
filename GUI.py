@@ -42,13 +42,13 @@ class Window(QWidget and QMainWindow):
 
     def mainWindow(self):
         self.delete_current_widgets()
-        self.resize(250, 250)
+        self.resize(250, 200)
         self.setWindowTitle('Corkscrew')
 
         self.runBtn = QPushButton('RUN BENCHMARK', self)
         self.runBtn.setGeometry(20, 20, 210, 30)
         self.runBtn.clicked.connect(self.open_heaven)
-        self.runBtn.clicked.connect(self.gpu_util_timer)
+        #self.runBtn.clicked.connect(self.gpu_util_timer)
 
         self.runBtn.clicked.connect(self.cpu_util_timer)
         self.runBtn.clicked.connect(self.ram_util_timer)
@@ -90,22 +90,22 @@ class Window(QWidget and QMainWindow):
         self.setWindowTitle('Corkscrew')
 
         self.username = QLineEdit(self)
-        self.username.move(50, 35)
+        self.username.move(50, 50)
         self.username.resize(self.username.sizeHint())
         self.username.setPlaceholderText("Username")
 
         self.password = QLineEdit(self)
-        self.password.move(50, 105)
+        self.password.move(50, 120)
         self.password.resize(self.password.sizeHint())
         self.password.setEchoMode(QLineEdit.Password)
         self.password.setPlaceholderText("Password")
 
         self.log_in = QPushButton("Login", self)
-        self.log_in.move(50, 175)
+        self.log_in.move(150, 200)
         self.log_in.resize(self.log_in.sizeHint())
 
         self.sign_up = QPushButton("Sign up", self)
-        self.sign_up.move(150, 175)
+        self.sign_up.move(50, 200)
         self.sign_up.resize(self.sign_up.sizeHint())
 
         self.sign_up.clicked.connect(lambda: self.reg_connect(self.username.text(), self.password.text()))
@@ -170,7 +170,7 @@ class Window(QWidget and QMainWindow):
     # cpu
 
     def cpu_util_timer(self):
-        for n in range(100):
+        for n in range(10):
             Graph.cpu_y.append(psutil.cpu_percent())
             Graph.time_x.append(n)
             time.sleep(1)
@@ -188,7 +188,7 @@ class Window(QWidget and QMainWindow):
     # gpu
 
     def gpu_util_timer(self):
-        for n in range(100):
+        for n in range(10):
             try:
                 GPUs = GPUtil.getGPUs()
                 gpu_load = GPUs[0].load *100
@@ -213,7 +213,7 @@ class Window(QWidget and QMainWindow):
 
     def ram_util_timer(self):
         mem = virtual_memory()
-        for _ in range(100):
+        for _ in range(10):
             Graph.ram_y.append(mem.percent)
             time.sleep(1)
         print(Graph.ram_y)
@@ -261,7 +261,8 @@ class HelpWindow(QMainWindow):
 
     def FourthWindow(self):
         self.resize(250, 250)
-        self.move(500, 0)
+        self.setWindowTitle('Help')
+
 
         self.b = QPlainTextEdit(self)
         self.b.insertPlainText('1. Use Recommended Benchmark settings\n2. Save Run Benchmark\n'
@@ -284,7 +285,8 @@ class PcWindow(QMainWindow):
 
     def Secondwindow(self):
         self.resize(250, 250)
-        self.move(0,0)
+        self.setWindowTitle('Hardware')
+
 
  # cpu
         self.cpu1btn = QPushButton('CPU Type', self)
@@ -356,7 +358,6 @@ class ResWindow(QMainWindow and QWidget):
     def Thirdwindow(self):
         self.resize(250, 450)
         self.setWindowTitle('Results')
-        self.move(250,0)
 
  # cpu
 
@@ -367,6 +368,8 @@ class ResWindow(QMainWindow and QWidget):
         self.cpu_rec.move(0, 30)
         self.cpu_rec.setPlaceholderText('recommended CPU(s)')
 
+        self.cpubtn.clicked.connect(self.cpu_list)
+
  # gpu
 
         self.gpubtn = QPushButton('GPUs', self)
@@ -376,7 +379,88 @@ class ResWindow(QMainWindow and QWidget):
         self.gpu_rec.move(0, 260)
         self.gpu_rec.setPlaceholderText('recommended GPU(s)')
 
+        self.gpubtn.clicked.connect(self.gpu_list)
+
         self.show()
+
+    def bubble_sort(self, arr):
+        length = len(arr)
+
+        for i in range(length):
+            for n in range(0, length-i-1):
+                if arr[n] > arr[n+1] :
+                    arr[n], arr[n+1] = arr[n+1], arr[n]
+
+        return arr
+
+    def cpu_list(self):
+        db = Database
+        length = len(db.recommend_cpu)
+        values = []
+        sort_part = []
+
+        temp = db.recommend_cpu[:]
+
+        for i in range(length):
+            values.append(len(db.recommend_cpu[i]))
+
+        array = ResWindow.bubble_sort(self, values)
+        arrlength = len(array)
+
+        for i in range(arrlength):
+            for n in range(length):
+                try:
+                    if array[i] == len(temp[n]):
+                        sort_part.append(temp[n])
+                        temp.remove(temp[n])
+                except:
+                    print('out of range')
+        for i in range(len(db.recommend_cpu_url)):
+            sort_part.append(db.recommend_cpu_url[i])
+
+        print(sort_part)
+
+        part_string = 'Recommendations are: '
+        for i in range(len(sort_part)):
+            part_string = part_string + str(sort_part[i]) + ' '
+        print(part_string)
+
+        self.cpu_rec.insertPlainText(part_string)
+
+
+    def gpu_list(self):
+        db = Database
+        length = len(db.recommend_gpu)
+        values = []
+        sort_part = []
+
+        temp = db.recommend_gpu[:]
+
+        for i in range(length):
+            values.append(len(db.recommend_gpu[i]))
+
+        array = ResWindow.bubble_sort(self, values)
+        arrlength = len(array)
+
+        for i in range(arrlength):
+            for n in range(length):
+                try:
+                    if array[i] == len(temp[n]):
+                        sort_part.append(temp[n])
+                        temp.remove(temp[n])
+                except:
+                    print('out of range')
+        for i in range(len(db.recommend_gpu_url)):
+            sort_part.append(db.recommend_gpu_url[i])
+
+        print(sort_part)
+
+        part_string = 'Recommendations are: '
+        for i in range(len(sort_part)):
+            part_string = part_string + str(sort_part[i]) + ' '
+        print(part_string)
+
+        self.gpu_rec.insertPlainText(part_string)
 
 
 if __name__ == '__main__':
