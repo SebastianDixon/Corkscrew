@@ -129,7 +129,7 @@ class Database():
                     print('correct password')
                 else:
                     print('wrong password')
-                    #return self.reject_user()
+                    return self.reject_user()
 
                 self.connection.commit()
 

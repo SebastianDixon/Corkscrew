@@ -224,7 +224,7 @@ class Window(QWidget and QMainWindow):
 
         100 seconds for each components testing to fill the 300 second benchmark time
         """
-        for n in range(10):    
+        for n in range(100):    
             Graph.cpu_y.append(psutil.cpu_percent())
             Graph.time_x.append(n)
             time.sleep(1)
@@ -252,7 +252,7 @@ class Window(QWidget and QMainWindow):
 
         100 seconds for each components testing to fill the 300 second benchmark time
         """
-        for n in range(10):
+        for n in range(100):
             try:
                 GPUs = GPUtil.getGPUs()
                 gpu_load = GPUs[0].load *100
@@ -285,7 +285,7 @@ class Window(QWidget and QMainWindow):
         100 seconds for each components testing to fill the 300 second benchmark time
         """
         mem = virtual_memory()
-        for _ in range(10):
+        for _ in range(100 442):
             Graph.ram_y.append(mem.percent)
             time.sleep(1)
         print(Graph.ram_y)
