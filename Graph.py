@@ -1,11 +1,20 @@
 import pyqtgraph as pg
 
 cpu_y = []
-gpu_y = [10,20,4,6,3,5,87,67,86,9]
+gpu_y = []
 ram_y = []
 time_x = []
 
 def util_graphs():
+    """
+    a graph GUI is created to illustrate the utilisation differences between the core components of the system
+
+    the data is from the functions in the GUI script which appended data to the four arrays.
+
+    the library pyqtgraph is used to model the data
+
+    different colours for each line make identification of key components easier
+    """
     try:
         plt = pg.plot()
         plt.addLegend()
@@ -17,7 +26,7 @@ def util_graphs():
         plt.plot(time_x, gpu_y, pen='r', symbol='o', symbolPen='r', symbolBrush=0.2, name='gpu')
         plt.plot(time_x, ram_y, pen='g', symbol='x', symbolPen='g', symbolBrush=0.2, name='ram')
     except:
-        print('no work')
+        print('data type error')
 
 if __name__ == '__main__':
     import sys

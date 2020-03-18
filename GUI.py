@@ -23,6 +23,9 @@ class Window(QWidget and QMainWindow):
         self.loginWindow()
 
     def delete_current_widgets(self):
+        """
+        removes all current widgets in the window
+        """
         try:
             for _ in range(len(self.widgets)):
                 if type(self.widgets[0]) is not str:
@@ -33,6 +36,9 @@ class Window(QWidget and QMainWindow):
             print("no1")
 
     def show_widgets(self):
+        """
+        displays all the new widgets for the new window
+        """
         try:
             for widget in self.widgets:
                 widget.show()
@@ -41,6 +47,11 @@ class Window(QWidget and QMainWindow):
             print("no2")
 
     def mainWindow(self):
+        """
+        the main menu for navigating Corkscrew
+
+        assigns the order of operations for the benchmarking process.
+        """
         self.delete_current_widgets()
         self.resize(250, 200)
         self.setWindowTitle('Corkscrew')
@@ -48,13 +59,15 @@ class Window(QWidget and QMainWindow):
         self.runBtn = QPushButton('RUN BENCHMARK', self)
         self.runBtn.setGeometry(20, 20, 210, 30)
         self.runBtn.clicked.connect(self.open_heaven)
-        #self.runBtn.clicked.connect(self.gpu_util_timer)
 
-        self.runBtn.clicked.connect(self.cpu_util_timer)
         self.runBtn.clicked.connect(self.ram_util_timer)
+        self.runBtn.clicked.connect(self.gpu_util_timer)
+        self.runBtn.clicked.connect(self.cpu_util_timer)
+
         self.runBtn.clicked.connect(self.cpu_util_mean)
         self.runBtn.clicked.connect(self.ram_util_mean)
         self.runBtn.clicked.connect(self.gpu_util_mean)
+
         self.runBtn.clicked.connect(self.util_difference)
 
         self.graph = QPushButton('Graph', self)
@@ -85,6 +98,15 @@ class Window(QWidget and QMainWindow):
     # account info
 
     def loginWindow(self):
+        """
+        allows a user to login or sign up with an account for the application
+
+        the first window of the program
+
+        blocks out the password plaintext for security
+
+        starts the database account system 
+        """
         self.delete_current_widgets()
         self.resize(250, 250)
         self.setWindowTitle('Corkscrew')
@@ -116,20 +138,42 @@ class Window(QWidget and QMainWindow):
         self.show()
 
     def reg_connect(self, username, password):
+        """
+        initialises the connection to the database class passing the username and password from the login window
+
+        the registration object in the class is specified
+        """
         db = Database.Database()
         return db.registration(username, password)
 
     def reject_reg(self):
+        """
+        returns the user back to the login window if the information is rejected by the database class
+        """
         QMessageBox.about(self, "Notice", "Username invalid")
         self.show()
 
     def sign_connect(self, username, password):
+        """
+        initialises the connection to the database class passing the username and password from the login window
+
+        the sign up object in the class is specified
+        """
         db = Database.Database()
         return db.login(username, password)
 
     # bottleneck calculator
 
     def util_difference(self):
+        """
+        determines the bottleneck using the utilisation tests during the benchmark
+
+        comparing the mean average utilisation of the components a bottleneck is found
+
+        a file system GUI is opened in order for the user to specific the directory of the benchmark results file
+
+        the note object is called after determining the bottleneck
+        """
         global bottle
         c_length = len(Graph.cpu_y)
         g_length = len(Graph.gpu_y)
@@ -154,9 +198,14 @@ class Window(QWidget and QMainWindow):
 
         self.result_box = QTextEdit(self)
         self.result_box.move(120, 0)
-        self.result_box.setPlaceholderText('CPU')
+        self.result_box.setPlaceholderText('Component')
 
     def note(self):
+        """
+        Gives a window notification to the user detailing which component is bottlenecking the system
+
+        calls the specific component object in the database class 
+        """
         db = Database.Database()
 
         if bottle == 'CPU':
@@ -170,13 +219,21 @@ class Window(QWidget and QMainWindow):
     # cpu
 
     def cpu_util_timer(self):
-        for n in range(10):
+        """
+        the percentage utilisation of the cpu is found and append to the cpu specific array in the graph script
+
+        100 seconds for each components testing to fill the 300 second benchmark time
+        """
+        for n in range(10):    
             Graph.cpu_y.append(psutil.cpu_percent())
             Graph.time_x.append(n)
             time.sleep(1)
         print(Graph.cpu_y)
 
     def cpu_util_mean(self):
+        """
+        finds the mean average of the cpu utilisaiton in the array of values
+        """
         length = len(Graph.cpu_y)
         product = 0
         for x in range(length):
@@ -188,6 +245,13 @@ class Window(QWidget and QMainWindow):
     # gpu
 
     def gpu_util_timer(self):
+        """
+        the percentage utilisation of the gpu is found and append to the gpu specific array in the graph script
+
+        the brand of gpu is found and the utilisaiton is found using either the NVIDIA or AMD based gpu library
+
+        100 seconds for each components testing to fill the 300 second benchmark time
+        """
         for n in range(10):
             try:
                 GPUs = GPUtil.getGPUs()
@@ -201,6 +265,9 @@ class Window(QWidget and QMainWindow):
         print(Graph.gpu_y)
 
     def gpu_util_mean(self):
+        """
+        finds the mean average of the gpu utilisaiton in the array of values
+        """
         length = len(Graph.gpu_y)
         product = 0
         for x in range(0, length):
@@ -212,6 +279,11 @@ class Window(QWidget and QMainWindow):
     # ram
 
     def ram_util_timer(self):
+        """
+        the percentage utilisation of the ram is found and append to the ram specific array in the graph script
+
+        100 seconds for each components testing to fill the 300 second benchmark time
+        """
         mem = virtual_memory()
         for _ in range(10):
             Graph.ram_y.append(mem.percent)
@@ -219,6 +291,9 @@ class Window(QWidget and QMainWindow):
         print(Graph.ram_y)
 
     def ram_util_mean(self):
+        """
+        finds the mean average of the ram utilisaiton in the array of values
+        """
         length = len(Graph.ram_y)
         product = 0
         for x in range(0, length):
@@ -230,6 +305,11 @@ class Window(QWidget and QMainWindow):
     # benchmark
 
     def open_heaven(self):
+        """
+        opens the directory for the Uningine heaven benchmark software on the users device 
+
+        the function supports both windows and macOS operating systems
+        """
         try:
             os.startfile(
                 'C:/ProgramData/Microsoft/Windows/Start Menu/'
@@ -238,7 +318,7 @@ class Window(QWidget and QMainWindow):
             subprocess.call(
                 ["/usr/bin/open", "-W", "-n", "-a", "/Applications/Heaven.app"])
 
-    # random
+    # window
 
     def output_util_graphs(self):
         return Graph.util_graphs
@@ -260,6 +340,11 @@ class HelpWindow(QMainWindow):
         self.FourthWindow()
 
     def FourthWindow(self):
+        """
+        displays a list of help items for how to manage the program 
+
+        shows what settings to use for the benchmark
+        """
         self.resize(250, 250)
         self.setWindowTitle('Help')
 
@@ -284,6 +369,9 @@ class PcWindow(QMainWindow):
         self.Secondwindow()
 
     def Secondwindow(self):
+        """
+        three button and text box window for the user to find out the components inside their system
+        """
         self.resize(250, 250)
         self.setWindowTitle('Hardware')
 
@@ -321,6 +409,9 @@ class PcWindow(QMainWindow):
  # functions
 
     def cpu_name(self):
+        """
+        uses the  library cpuinfo for the model part of the users current CPU
+        """
         before = cpuinfo.get_cpu_info()['brand']
         after = before.split(' ')
         model = after[2].split('-')[1]
@@ -328,6 +419,11 @@ class PcWindow(QMainWindow):
         return model
 
     def gpu_name(self):
+        """
+        finds the model part of the users current GPU(s)
+
+        Uses either the GPUtil or pyadl library for NVIDIA or AMD support
+        """
         try:
             try:
                 GPUs = GPUtil.getGPUs()
@@ -340,6 +436,9 @@ class PcWindow(QMainWindow):
             self.gpu_box.insertPlainText('no gpu found')
 
     def ram_find(self):
+        """
+        uses the os library for finding the quantity of ram in the system
+        """
         mem = virtual_memory()
         lower = mem.total / 1000000000
         gigByte = round(lower, 1)
@@ -356,23 +455,30 @@ class ResWindow(QMainWindow and QWidget):
         self.Thirdwindow()
 
     def Thirdwindow(self):
+        """
+        a GUI display of the result of the benchmarking and analysis process
+
+        two buttons and text boxes for the recommended items on both parts, either CPU or GPU recommendations
+
+        the URL for each upgrade is also given here
+        """
         self.resize(250, 450)
         self.setWindowTitle('Results')
 
  # cpu
 
-        self.cpubtn = QPushButton('CPUs', self)
+        self.cpubtn = QPushButton('GPUs', self)
         self.cpubtn.sizeHint()
         self.cpubtn.move(0, 0)
         self.cpu_rec = QTextEdit(self)
-        self.cpu_rec.move(0, 30)
+        self.cpu_rec.move(0, 30) 
         self.cpu_rec.setPlaceholderText('recommended CPU(s)')
 
         self.cpubtn.clicked.connect(self.cpu_list)
 
  # gpu
 
-        self.gpubtn = QPushButton('GPUs', self)
+        self.gpubtn = QPushButton('CPUs', self)
         self.gpubtn.sizeHint()
         self.gpubtn.move(0, 230)
         self.gpu_rec = QTextEdit(self)
@@ -384,6 +490,9 @@ class ResWindow(QMainWindow and QWidget):
         self.show()
 
     def bubble_sort(self, arr):
+        """
+        a bubble sort function for sorting the lengths of the recommended components
+        """
         length = len(arr)
 
         for i in range(length):
@@ -394,6 +503,19 @@ class ResWindow(QMainWindow and QWidget):
         return arr
 
     def cpu_list(self):
+        """
+        a function for outputting the recommended cpu models to the results table
+
+        called when the button widget is toggled in the thirdwindow object
+
+        uses a set of temporary arrays for arranging unsorted and then sorted data 
+
+        the bubble sort function is used for arranging the lengths of the components
+
+        uses string modulation and data structure parsing for outputting correct data
+
+        outputs data to the cpu_rec widget object in thirdwindow
+        """
         db = Database
         length = len(db.recommend_cpu)
         values = []
@@ -418,6 +540,9 @@ class ResWindow(QMainWindow and QWidget):
         for i in range(len(db.recommend_cpu_url)):
             sort_part.append(db.recommend_cpu_url[i])
 
+        for i in range(length):
+            sort_part.append(db.recommend_cpu[i])
+
         print(sort_part)
 
         part_string = 'Recommendations are: '
@@ -429,6 +554,19 @@ class ResWindow(QMainWindow and QWidget):
 
 
     def gpu_list(self):
+        """
+        a function for outputting the recommended gpu models to the results table
+
+        called when the button widget is toggled in the thirdwindow object
+
+        uses a set of temporary arrays for arranging unsorted and then sorted data 
+
+        the bubble sort function is used for arranging the lengths of the components
+
+        uses string modulation and data structure parsing for outputting correct data
+
+        outputs data to the gpu_rec widget object in thirdwindow
+        """
         db = Database
         length = len(db.recommend_gpu)
         values = []
@@ -452,8 +590,6 @@ class ResWindow(QMainWindow and QWidget):
                     print('out of range')
         for i in range(len(db.recommend_gpu_url)):
             sort_part.append(db.recommend_gpu_url[i])
-
-        print(sort_part)
 
         part_string = 'Recommendations are: '
         for i in range(len(sort_part)):

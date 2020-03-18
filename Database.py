@@ -7,10 +7,10 @@ import GUI
 import cryptography 
 
 results = []
-recommend_cpu = ['thingsss', 'superlongname123', 'short', 'this', 'that']
-recommend_cpu_url = ['www.google.com']
-recommend_gpu = ['gpus', 'are', 'superduper', 'awesome', 'and', 'fast', 'and', 'expensive']
-recommend_gpu_url = ['www.bing.com']
+recommend_cpu = []
+recommend_cpu_url = []
+recommend_gpu = []
+recommend_gpu_url = []
 
 
 
@@ -25,6 +25,11 @@ class Database():
                                           cursorclass= pymysql.cursors.DictCursor)
 
     def openFile(self):
+        """
+        uses the QFileDialog widget for a file explorer GUI
+
+        the html file input is parsed using beautiful soup
+        """
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(None, "QFileDialog.getOpenFileName()", "",
@@ -33,13 +38,26 @@ class Database():
         if fileName:
             file = open(fileName)
             data = file.read()
-            soup = BeautifulSoup(data)
+            soup = BeautifulSoup(data, features="html.parser")
             for item in soup.find_all('strong'):
                 results.append(float(item.text))
         print('Score =', results[1])
         print('Fps =', results[0])
 
     def registration(self, user1, password):
+        """
+        an account is created using the username and password input from the login window GUI
+
+        an mySQL table stores the information of the account under one row and four differe columns
+
+        the username is pushed as plaintext to the table, the password as a hash
+
+        the hash function takes input of both a random salt and password plaintext for more security
+
+        UPDATE, SELECT and INSERT SQL statements are used for registering a user
+
+        the main window from the GUI script is called at the end of the process given it is successful
+        """
         salt = os.urandom(32)
         pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
         key_string = str(pass_key)
@@ -83,6 +101,17 @@ class Database():
         return gui.mainWindow()
 
     def login(self, user2, password):
+        """
+        the login process is initiated using the username and password from the login window 
+
+        the user table stores the password salt and hash which are used in ensuring the password is correct
+
+        the calculated password hash and stored passwordhash are compared to check correct credentials against the username
+
+        SELECT statements are used for data input from the mySQL table
+
+        the main window from the GUI script is called at the end of the process given it is successful
+        """
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("SELECT `PasswordSalt` FROM Hardware.Login WHERE `Username` = %s", user2)
@@ -115,17 +144,28 @@ class Database():
         return gui.mainWindow()
 
     def salt_hash(self, plain_word):
+        """
+        an input of the plaintext password is used with a random calculated salt to generate a password hash
+
+        the hash is generated in a byte data type
+        """
         salt = os.urandom(32)
         pass_key = hashlib.pbkdf2_hmac('sha256', plain_word.encode('utf-8'), salt, 100000)
         print(pass_key)
         return pass_key
 
     def reject_user(self):
+        """
+        if the credentials of a login process are incorrect, this function returns the user back to the login window to try again
+        """
         gui = GUI.Window()
         gui.reject_reg()
         return gui.loginWindow()
 
     def pop_name(self):
+        """
+        this function opens a text box for the user to manually input the name of their component if the model cannot be specified 
+        """
         text, okPressed = QInputDialog.getText(self, "Component Name", "name:", QLineEdit.Normal, "")
         if okPressed and text != '':
             return text
@@ -133,6 +173,15 @@ class Database():
             self.pop_name()
 
     def getCpuDetails(self):
+        """
+        this function uses the parts table to find compatable components to output to the user as upgrades
+
+        SELECT SQL statements are used to find the GPU items
+
+        the url for each upgrade is created using string parsing
+
+        the results for which are output to the arrays for cpu recommendations
+        """
         temp = []
         temp2 = []
         try:
@@ -164,11 +213,22 @@ class Database():
                 url = part1 + joined + part2
             except:
                 url = part1 + recommend_cpu[i] + part2
-            print(url)
+            recommend_cpu_url.append(url)
+            print(recommend_cpu_url)
+
     
         return recommend_cpu
 
     def getGpuDetails(self):
+        """
+        this function uses the parts table to find compatable components to output to the user as upgrades
+
+        SELECT SQL statements are used to find the CPU items
+
+        the url for each upgrade is created using string parsing
+
+        the results for which are output to the arrays for gpu recommendations
+        """
         temp = []
         temp2 = []
         try:
@@ -200,24 +260,3 @@ class Database():
             print(url)
 
         return recommend_gpu
-
-    def cpu_URL(self):
-        part1 = 'https://www.amazon.co.uk/s?k='
-        part2 = '&ref=nb_sb_noss_2'
-        for i in range(0, len(recommend_cpu)):
-            try:
-                split1 = recommend_cpu[i].split(' ')
-                joined = split1[0] + split1[1]
-                url = part1 + joined + part2
-            except:
-                url = part1 + recommend_cpu[i] + part2
-            print(url)
-
-    def gpu_URL(self):
-        part1 = 'https://www.amazon.co.uk/s?k='
-        part2 = '&ref=nb_sb_noss_2'
-        for i in range(0, len(recommend_gpu)):
-            split1 = recommend_gpu[i].split(' ')
-            joined = split1[0] + split1[1]
-            url = part1 + joined + part2
-            print(url)
