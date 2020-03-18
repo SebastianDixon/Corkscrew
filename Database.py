@@ -61,7 +61,6 @@ class Database():
         salt = os.urandom(32)
         pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
         key_string = str(pass_key)
-        salt_str = str(salt)
 
         try:
             with self.connection.cursor() as cursor:
@@ -75,7 +74,7 @@ class Database():
                 data2 = (key_string, new_row)
 
                 salt_push = "UPDATE Hardware.Login SET `PasswordSalt` = %s WHERE `UserID` = %s"
-                data3 = (salt_str, new_row)
+                data3 = (salt, new_row)
 
                 cursor.execute("SELECT `Username` FROM Hardware.Login")
                 rows = cursor.fetchall()
@@ -117,11 +116,8 @@ class Database():
                 cursor.execute("SELECT `PasswordSalt` FROM Hardware.Login WHERE `Username` = %s", user2)
                 row = cursor.fetchone()
                 pullsalt = row['PasswordSalt']
-                remove_b = pullsalt[2:-1]
-                remove_d = (remove_b.replace('\\', ''))
                 
-                b = bytes(remove_d, 'utf-8')
-                pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), b, 100000)
+                pass_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), pullsalt, 100000)
                 key_string = str(pass_key)
 
                 cursor.execute("SELECT `PasswordHash` FROM Hardware.Login WHERE `Username` = %s", user2)
